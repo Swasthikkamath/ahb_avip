@@ -41,6 +41,12 @@ module HdlTop;
 
  AhbSlaveAgentBFM ahbSlaveAgentBFM(ahbInterface); 
 
+  
+  initial begin
+    $dumpfile("waveform.vcd");
+    $dumpvars(0, HdlTop); 
+  end
+
 endmodule : HdlTop
 
 `endif
