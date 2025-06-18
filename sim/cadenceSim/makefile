@@ -146,7 +146,7 @@ simulate:
 	#TODO
 	# need to be updated command for coverage, able to generate .ucd file but imc not working
  
-	mv *.vcd $(test_folder)/
+	mv *.vcd $(test_folder)/$(test).vcd
 	# For checking and reporting simulation errors
 	make simulate_war_err
 
@@ -214,7 +214,7 @@ simulate_war_err:
 	echo "";
 	echo "Log file path: $(test_folder)/$(test).log"
 	echo "";
-	echo "Waveform: simvision $(test_folder)/waveform.vcd &"
+	echo "Waveform: simvision $(test_folder)/$(test).vcd &"
 	echo "";
 	#echo "Coverage report: firefox $(test_folder)/html_cov_report/index.html &"
 	#echo "";
