@@ -7,6 +7,7 @@ class AhbReadWithWaitStateTest extends AhbBaseTest;
   AhbVirtualReadWithWaitStateSequence ahbVirtualReadWithWaitStateSequence; 
  
   extern function new(string name = "AhbReadWithWaitStateTest", uvm_component parent = null);
+  extern virtual function void setupAhbEnvironmentConfig();
   extern virtual task run_phase(uvm_phase phase);
 
 endclass : AhbReadWithWaitStateTest
@@ -15,6 +16,10 @@ function AhbReadWithWaitStateTest::new(string name = "AhbReadWithWaitStateTest",
   super.new(name, parent);
 endfunction : new
 
+function void AhbReadWithWaitStateTest::setupAhbEnvironmentConfig();
+ super.setupAhbEnvironmentConfig();
+ ahbEnvironmentConfig.operationMode = READ;
+endfunction : setupAhbEnvironmentConfig
 
 task AhbReadWithWaitStateTest::run_phase(uvm_phase phase);
   

@@ -73,10 +73,11 @@ typedef enum logic [2:0] {
     PRIVILEGED_NONSECURE_INSTRUCTION = 4'b0111
   } ahbProtectionEnum;
 
-  typedef enum bit{
-	WRITE = 1'b1,
-	READ = 1'b0
-	}ahbWriteEnum;
+  typedef enum bit[1:0]{
+	WRITE = 2'b01,
+	READ  = 2'b00,
+  WRITE_READ  = 2'b10
+	}ahbOperationEnum;
 
 typedef struct {
 logic  [ADDR_WIDTH-1:0]  haddr;          // Address of the transfer
@@ -91,7 +92,7 @@ logic [HMASTER_WIDTH-1:0] hmaster;     // Master ID
 ahbTransferEnum          htrans;        // Transfer type
 logic [2**LENGTH:0] [DATA_WIDTH-1:0]   hwdata;         // Write data bus
 logic [2**LENGTH:0] [(DATA_WIDTH/8)-1:0] hwstrb;     // Write strobes
-ahbWriteEnum            hwrite;         // Write or read indicator
+ahbOperationEnum        hwrite;         // Write or read indicator
 logic [2**LENGTH:0] [DATA_WIDTH-1:0]  hrdata;         // Read data bus
 logic                   hreadyout;      // Transfer completion for subordinate
 ahbRespEnum             hresp;          // Response status

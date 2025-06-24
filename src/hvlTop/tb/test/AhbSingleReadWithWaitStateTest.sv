@@ -1,4 +1,3 @@
-
 `ifndef AHBSINGLEREADWITHWAITSTATETEST_INCLUDED_
 `define AHBSINGLEREADWITHWAITSTATETEST_INCLUDED_
 
@@ -8,6 +7,7 @@ class AhbSingleReadWithWaitStateTest extends AhbBaseTest;
   AhbVirtualSingleReadWithWaitStateSequence ahbVirtualSingleReadWithWaitStateSequence; 
  
   extern function new(string name = "AhbSingleReadWithWaitStateTest", uvm_component parent = null);
+  extern virtual function void setupAhbEnvironmentConfig();
   extern virtual task run_phase(uvm_phase phase);
 
 endclass : AhbSingleReadWithWaitStateTest
@@ -16,6 +16,10 @@ function AhbSingleReadWithWaitStateTest::new(string name = "AhbSingleReadWithWai
   super.new(name, parent);
 endfunction : new
 
+function void AhbSingleReadWithWaitStateTest::setupAhbEnvironmentConfig();
+ super.setupAhbEnvironmentConfig();
+ ahbEnvironmentConfig.operationMode = READ;
+endfunction : setupAhbEnvironmentConfig
 
 task AhbSingleReadWithWaitStateTest::run_phase(uvm_phase phase);
 

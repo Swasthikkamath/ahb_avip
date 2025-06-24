@@ -16,7 +16,7 @@ class AhbMasterTransaction extends uvm_sequence_item;
   rand ahbTransferEnum htrans;
   rand bit [DATA_WIDTH-1:0] hwdata[$:2**LENGTH];
   rand bit [(DATA_WIDTH/8)-1:0] hwstrb[$:2**LENGTH];
-  rand ahbWriteEnum hwrite;
+  rand ahbOperationEnum hwrite;
   bit [DATA_WIDTH-1:0] hrdata[$:2**LENGTH];
   bit hreadyout;
   ahbRespEnum hresp;

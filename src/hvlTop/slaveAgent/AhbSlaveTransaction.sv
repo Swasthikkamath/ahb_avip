@@ -16,7 +16,7 @@ class AhbSlaveTransaction extends uvm_sequence_item;
   ahbTransferEnum htrans;
   rand bit [DATA_WIDTH-1:0] hwdata[$:2**LENGTH];
   rand bit [(DATA_WIDTH/8)-1:0] hwstrb[$:2**LENGTH];
-  ahbWriteEnum hwrite;
+  ahbOperationEnum hwrite;
   rand bit [DATA_WIDTH-1:0] hrdata[$:2**LENGTH];
   rand bit hreadyout;
   ahbRespEnum hresp;

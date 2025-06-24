@@ -7,6 +7,7 @@ class AhbWriteWithWaitStateTest extends AhbBaseTest;
   AhbVirtualWriteWithWaitStateSequence ahbVirtualWriteWithWaitStateSequence; 
  
   extern function new(string name = "AhbWriteWithWaitStateTest", uvm_component parent = null);
+  extern virtual function void setupAhbEnvironmentConfig();
   extern virtual task run_phase(uvm_phase phase);
 
 endclass : AhbWriteWithWaitStateTest
@@ -15,6 +16,10 @@ function AhbWriteWithWaitStateTest::new(string name = "AhbWriteWithWaitStateTest
   super.new(name, parent);
 endfunction : new
 
+function void AhbWriteWithWaitStateTest::setupAhbEnvironmentConfig();
+ super.setupAhbEnvironmentConfig();
+ ahbEnvironmentConfig.operationMode = WRITE;
+endfunction : setupAhbEnvironmentConfig
 
 task AhbWriteWithWaitStateTest::run_phase(uvm_phase phase);
   

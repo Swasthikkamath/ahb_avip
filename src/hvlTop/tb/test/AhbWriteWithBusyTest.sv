@@ -7,6 +7,7 @@ class AhbWriteWithBusyTest extends AhbBaseTest;
   AhbVirtualWriteWithBusySequence ahbVirtualWriteWithBusySequence; 
  
   extern function new(string name = "AhbWriteWithBusyTest", uvm_component parent = null);
+  extern virtual function void setupAhbEnvironmentConfig();
   extern virtual task run_phase(uvm_phase phase);
 
 endclass : AhbWriteWithBusyTest
@@ -15,6 +16,11 @@ function AhbWriteWithBusyTest::new(string name = "AhbWriteWithBusyTest",uvm_comp
   super.new(name, parent);
 endfunction : new
 
+
+function void AhbWriteWithBusyTest::setupAhbEnvironmentConfig();
+ super.setupAhbEnvironmentConfig();
+ ahbEnvironmentConfig.operationMode = WRITE;
+endfunction : setupAhbEnvironmentConfig
 
 task AhbWriteWithBusyTest::run_phase(uvm_phase phase);
   

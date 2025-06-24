@@ -18,7 +18,7 @@ class AhbMasterSequence extends AhbMasterBaseSequence;
   rand ahbTransferEnum htransSeq;
   rand bit [DATA_WIDTH-1:0] hwdataSeq[$:2**LENGTH];
   rand bit [(DATA_WIDTH/8)-1:0] hwstrbSeq[$:2**LENGTH];
-  rand ahbWriteEnum hwriteSeq;
+  rand ahbOperationEnum hwriteSeq;
   rand bit hexokaySeq;
   rand bit busyControlSeq[];
 

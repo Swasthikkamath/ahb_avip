@@ -7,6 +7,7 @@ class AhbSingleWriteTest extends AhbBaseTest;
   AhbVirtualSingleWriteSequence ahbVirtualSingleWriteSequence; 
  
   extern function new(string name = "AhbSingleWriteTest", uvm_component parent = null);
+  extern virtual function void setupAhbEnvironmentConfig();
   extern virtual task run_phase(uvm_phase phase);
 
 endclass : AhbSingleWriteTest
@@ -15,6 +16,10 @@ function AhbSingleWriteTest::new(string name = "AhbSingleWriteTest",uvm_componen
   super.new(name, parent);
 endfunction : new
 
+function void AhbSingleWriteTest::setupAhbEnvironmentConfig();
+ super.setupAhbEnvironmentConfig();
+ ahbEnvironmentConfig.operationMode = WRITE;
+endfunction : setupAhbEnvironmentConfig
 
 task AhbSingleWriteTest::run_phase(uvm_phase phase);
 

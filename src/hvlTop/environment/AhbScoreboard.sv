@@ -8,6 +8,8 @@ class AhbScoreboard extends uvm_scoreboard;
 
   AhbSlaveTransaction ahbSlaveTransaction;
 
+  AhbEnvironmentConfig ahbEnvironmentConfig;
+
   uvm_tlm_analysis_fifo#(AhbMasterTransaction) ahbMasterAnalysisFifo[];
 
   uvm_tlm_analysis_fifo#(AhbSlaveTransaction) ahbSlaveAnalysisFifo[];
@@ -64,6 +66,9 @@ endfunction : new
 
 function void AhbScoreboard::build_phase(uvm_phase phase);
   super.build_phase(phase);
+  if(!uvm_config_db #(AhbEnvironmentConfig)::get(this,"","AhbEnvironmentConfig",ahbEnvironmentConfig)) begin
+    `uvm_fatal("FATAL_ENV_CONFIG", $sformatf("AhbScoreboard :: Couldn't get the env_config from config_db"))
+  end
 endfunction : build_phase
 
 task AhbScoreboard::run_phase(uvm_phase phase);
@@ -188,82 +193,104 @@ task AhbScoreboard::run_phase(uvm_phase phase);
 function void AhbScoreboard::check_phase(uvm_phase phase);
   super.check_phase(phase);
 
-  `uvm_info(get_type_name(),$sformatf("--\n----------------------------------------------SCOREBOARD CHECK PHASE---------------------------------------"),UVM_HIGH) 
-  `uvm_info (get_type_name(),$sformatf(" Scoreboard Check Phase is starting"),UVM_HIGH); 
-
-  if(ahbMasterTransaction.hwrite == WRITE)begin
-    if (( VerifiedMasterHwdataCount != 0) && (FailedMasterHwdataCount == 0)) begin
-      `uvm_info (get_type_name(), $sformatf ("all master_hwdata comparisions are succesful"),UVM_HIGH);
-    end
-    else begin
-      `uvm_info (get_type_name(), $sformatf (" VerifiedMasterHwdataCount :%0d",
-                                             VerifiedMasterHwdataCount),UVM_HIGH);
-
-      `uvm_info (get_type_name(), $sformatf ("FailedMasterHwdataCount : %0d", 
-                                             FailedMasterHwdataCount),UVM_HIGH);
-      `uvm_error ("SC_CheckPhase", $sformatf ("comparisions of master_hwdata not happened"));
-    end
-  end
-
-  if ((VerifiedMasterHaddrCount != 0) && (FailedMasterHaddrCount == 0)) begin
-    `uvm_info (get_type_name(), $sformatf ("all master_paddr comparisions are succesful"),UVM_HIGH);
-  end
-  else begin
-    `uvm_info (get_type_name(), $sformatf ("VerifiedMasterHaddrCount :%0d",
-                                           VerifiedMasterHaddrCount),UVM_HIGH);
-    `uvm_info (get_type_name(), $sformatf ("FailedMasterHaddrCount : %0d", 
-                                           FailedMasterHaddrCount),UVM_HIGH);
-    `uvm_error ("SC_CheckPhase", $sformatf ("comparisions of master_paddr not happened"));
-  end
-
-  if ((VerifiedMasterHwriteCount != 0) && (FailedMasterHwriteCount == 0)) begin
-    `uvm_info (get_type_name(), $sformatf ("all master_hwrite comparisions are succesful"),UVM_HIGH);
-  end
-  else begin
-    `uvm_info (get_type_name(), $sformatf ("VerifiedMasterHwriteCount :%0d",
-                                           VerifiedMasterHwriteCount),UVM_HIGH);
-    `uvm_info (get_type_name(), $sformatf ("FailedMasterHwriteCount : %0d", 
-                                           FailedMasterHwriteCount),UVM_HIGH);
-    `uvm_error ("SC_CheckPhase", $sformatf ("comparisions of master_hwrite not happened"));
-  end
-
-  if(ahbMasterTransaction.hwrite == READ)begin
-    if ((VerifiedSlaveHrdataCount != 0) && (FailedSlaveHrdataCount == 0) ) begin
-      `uvm_info (get_type_name(), $sformatf ("all slave_prdata comparisions are succesful"),UVM_HIGH);
-    end
-    else begin
-      `uvm_info (get_type_name(), $sformatf ("VerifiedSlaveHrdataCount :%0d",
-                                             VerifiedSlaveHrdataCount),UVM_HIGH);
-      `uvm_info (get_type_name(), $sformatf ("FaileddSlaveHrdataCount : %0d", 
-                                             FailedSlaveHrdataCount),UVM_HIGH);
-    end
-  end
+  `uvm_info(get_type_name(),$sformatf("--\n----------------------------------------------SCOREBOARD CHECK PHASE---------------------------------------"),UVM_HIGH)
+  `uvm_info (get_type_name(),$sformatf(" Scoreboard Check Phase is starting"),UVM_HIGH);
 
   if (ahbMasterTransactionCount == ahbSlaveTransactionCount) begin
-    `uvm_info (get_type_name(), $sformatf ("master and slave have equal no. of transactions"),UVM_HIGH);
+    `uvm_info (get_type_name(), $sformatf ("master and slave have equal no. of transactions = %0d",ahbMasterTransactionCount),UVM_HIGH);
+    `uvm_info (get_type_name(), $sformatf ("ahbMasterTransactionCount : %0d",ahbMasterTransactionCount ),UVM_HIGH);
+    `uvm_info (get_type_name(), $sformatf ("ahbSlaveTransactionCount : %0d",ahbSlaveTransactionCount),UVM_HIGH);
   end
-
   else begin
     `uvm_info (get_type_name(), $sformatf ("ahbMasterTransactionCount : %0d",ahbMasterTransactionCount ),UVM_HIGH);
     `uvm_info (get_type_name(), $sformatf ("ahbSlaveTransactionCount  : %0d",ahbSlaveTransactionCount  ),UVM_HIGH);
     `uvm_error ("SC_CheckPhase", $sformatf ("master and slave doesnot have same no.of transactions"));
-  end 
+  end
 
-  if( ahbMasterAnalysisFifo[indexMaster].size() == 0)begin
+  if(ahbEnvironmentConfig.operationMode == WRITE_READ) begin
+    if (( VerifiedMasterHwdataCount != 0) && (FailedMasterHwdataCount == 0)) begin
+      `uvm_info (get_type_name(), $sformatf ("master and slave writeData comparisions are equal = %0d",VerifiedMasterHwdataCount),UVM_HIGH);
+    end
+    else begin
+      `uvm_info (get_type_name(), $sformatf ("VerifiedMasterHwdataCount :%0d",
+                                             VerifiedMasterHwdataCount),UVM_HIGH);
+      `uvm_info (get_type_name(), $sformatf ("FailedMasterHwdataCount : %0d",
+                                             FailedMasterHwdataCount),UVM_HIGH);
+      `uvm_error ("SC_CheckPhase", $sformatf ("master and slave writeData comparisions Not equal"));
+    end
+
+    if ((VerifiedSlaveHrdataCount != 0) && (FailedSlaveHrdataCount == 0) ) begin
+      `uvm_info (get_type_name(), $sformatf ("master and slave readData comparisions are equal = %0d",VerifiedSlaveHrdataCount),UVM_HIGH);
+    end
+    else begin
+      `uvm_info (get_type_name(), $sformatf ("VerifiedSlaveHrdataCount :%0d",
+                                             VerifiedSlaveHrdataCount),UVM_HIGH);
+      `uvm_info (get_type_name(), $sformatf ("FailedSlaveHrdataCount : %0d",
+                                             FailedSlaveHrdataCount),UVM_HIGH);
+      `uvm_error ("SC_CheckPhase", $sformatf ("master and slave readData comparisions Not equal"));
+    end
+  end
+  else if(ahbEnvironmentConfig.operationMode == WRITE) begin
+
+    if (( VerifiedMasterHwdataCount != 0) && (FailedMasterHwdataCount == 0)) begin
+      `uvm_info (get_type_name(), $sformatf ("master and slave writeData comparisions are equal = %0d",VerifiedMasterHwdataCount),UVM_HIGH);
+    end
+    else begin
+      `uvm_info (get_type_name(), $sformatf ("VerifiedMasterHwdataCount :%0d",
+                                             VerifiedMasterHwdataCount),UVM_HIGH);
+      `uvm_info (get_type_name(), $sformatf ("FailedMasterHwdataCount : %0d",
+                                             FailedMasterHwdataCount),UVM_HIGH);
+      `uvm_error ("SC_CheckPhase", $sformatf ("master and slave writeData comparisions Not equal"));
+    end
+  end
+  else if(ahbEnvironmentConfig.operationMode == READ) begin
+    if ((VerifiedSlaveHrdataCount != 0) && (FailedSlaveHrdataCount == 0) ) begin
+      `uvm_info (get_type_name(), $sformatf ("master and slave readData comparisions are equal = %0d",VerifiedSlaveHrdataCount),UVM_HIGH);
+    end
+    else begin
+      `uvm_info (get_type_name(), $sformatf ("VerifiedSlaveHrdataCount :%0d",
+                                             VerifiedSlaveHrdataCount),UVM_HIGH);
+      `uvm_info (get_type_name(), $sformatf ("FailedSlaveHrdataCount : %0d",
+                                             FailedSlaveHrdataCount),UVM_HIGH);
+      `uvm_error ("SC_CheckPhase", $sformatf ("master and slave readData comparisions Not equal"));
+    end
+  end
+
+  if ((VerifiedMasterHaddrCount != 0) && (FailedMasterHaddrCount == 0)) begin
+    `uvm_info (get_type_name(), $sformatf ("master and slave address comparisions are equal = %0d",VerifiedMasterHaddrCount),UVM_HIGH);
+  end
+  else begin
+    `uvm_info (get_type_name(), $sformatf ("VerifiedMasterHaddrCount :%0d",
+                                           VerifiedMasterHaddrCount),UVM_HIGH);
+    `uvm_info (get_type_name(), $sformatf ("FailedMasterHaddrCount : %0d",
+                                           FailedMasterHaddrCount),UVM_HIGH);
+    `uvm_error ("SC_CheckPhase", $sformatf ("master and slave address comparisions Not equal"));
+  end
+
+  if ((VerifiedMasterHwriteCount != 0) && (FailedMasterHwriteCount == 0)) begin
+    `uvm_info (get_type_name(), $sformatf ("master and slave hwrite comparisions are equal = %0d",VerifiedMasterHwriteCount),UVM_HIGH);
+  end
+  else begin
+    `uvm_info (get_type_name(), $sformatf ("VerifiedMasterHwriteCount :%0d",
+                                           VerifiedMasterHwriteCount),UVM_HIGH);
+    `uvm_info (get_type_name(), $sformatf ("FailedMasterHwriteCount : %0d",
+                                           FailedMasterHwriteCount),UVM_HIGH);
+    `uvm_error ("SC_CheckPhase", $sformatf ("master and slave hwrite comparisions Not equal"));
+  end
+
+  if( ahbMasterAnalysisFifo[indexMaster].size() == 0) begin
     `uvm_info ("SC_CheckPhase", $sformatf ("AHB Master analysis FIFO is empty"),UVM_HIGH);
   end
-
   else begin
-    `uvm_info (get_type_name(), $sformatf (" ahbMasterAnalysisFifo:%0d", ahbMasterAnalysisFifo.size() ),UVM_HIGH);
-    `uvm_error ("SC_CheckPhase", $sformatf ("apb Master analysis FIFO is not empty"));
+    `uvm_info (get_type_name(), $sformatf (" ahbMasterAnalysisFifo:%0d", ahbMasterAnalysisFifo[indexMaster].size() ),UVM_HIGH);
+    `uvm_error ("SC_CheckPhase", $sformatf ("AHB Master analysis FIFO is not empty"));
   end
 
-  if( ahbSlaveAnalysisFifo[indexSlave].size()== 0)begin
+  if( ahbSlaveAnalysisFifo[indexSlave].size()== 0) begin
     `uvm_info ("SC_CheckPhase", $sformatf ("AHB Slave analysis FIFO is empty"),UVM_HIGH);
   end
   else begin
-    `uvm_info (get_type_name(), $sformatf (" ahbSlaveAnalysisFifo:%0d", ahbSlaveAnalysisFifo.size()),UVM_HIGH);
-
+    `uvm_info (get_type_name(), $sformatf (" ahbSlaveAnalysisFifo:%0d", ahbSlaveAnalysisFifo[indexSlave].size()),UVM_HIGH);
     `uvm_error ("SC_CheckPhase",$sformatf ("AHB Slave analysis FIFO is not empty"));
   end
 

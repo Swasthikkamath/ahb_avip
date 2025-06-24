@@ -56,7 +56,7 @@ interface AhbMasterMonitorBFM(input  bit   hclk,
     end
 
     ahbDataPacket.haddr = haddr;
-    ahbDataPacket.hwrite  = ahbWriteEnum'(hwrite);
+    ahbDataPacket.hwrite  = ahbOperationEnum'(hwrite);
     ahbDataPacket.hsize   = ahbHsizeEnum'(hsize);
     ahbDataPacket.hburst  = ahbBurstEnum'(hburst);
     ahbDataPacket.htrans  = ahbTransferEnum'(htrans);

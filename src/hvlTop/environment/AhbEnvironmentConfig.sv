@@ -24,6 +24,9 @@ class AhbEnvironmentConfig extends uvm_object;
   //Number of slaves connected to the SPI interface
   int noOfSlaves=1;
 
+  //Operation mode
+  ahbOperationEnum operationMode;
+
   //Variable: ahbMasterAgentConfig
   //Handle for master agent configuration
   AhbMasterAgentConfig ahbMasterAgentConfig[];
@@ -65,6 +68,8 @@ function void AhbEnvironmentConfig::do_print(uvm_printer printer);
   printer.print_field ("hasVirtualSequencer", hasVirtualSequencer, $bits(hasVirtualSequencer), UVM_DEC);
   printer.print_field ("noOfMasters",  noOfMasters,  $bits(noOfMasters), UVM_DEC);
   printer.print_field ("noOfSlaves",  noOfSlaves,  $bits(noOfSlaves), UVM_DEC);
+  printer.print_field ("operationMode",  operationMode,  $bits(operationMode), UVM_DEC);
+  printer.print_string ("operationMode",  operationMode.name());
 
 endfunction : do_print
 

@@ -7,6 +7,7 @@ class AhbReadTest extends AhbBaseTest;
   AhbVirtualReadSequence ahbVirtualReadSequence; 
  
   extern function new(string name = "AhbReadTest", uvm_component parent = null);
+  extern virtual function void setupAhbEnvironmentConfig();
   extern virtual task run_phase(uvm_phase phase);
 
 endclass : AhbReadTest
@@ -15,6 +16,10 @@ function AhbReadTest::new(string name = "AhbReadTest",uvm_component parent = nul
   super.new(name, parent);
 endfunction : new
 
+function void AhbReadTest::setupAhbEnvironmentConfig();
+ super.setupAhbEnvironmentConfig();
+ ahbEnvironmentConfig.operationMode = READ;
+endfunction : setupAhbEnvironmentConfig
 
 task AhbReadTest::run_phase(uvm_phase phase);
   foreach(ahbEnvironment.ahbSlaveAgentConfig[i]) begin

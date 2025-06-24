@@ -7,6 +7,7 @@ class AhbSingleReadTest extends AhbBaseTest;
   AhbVirtualSingleReadSequence ahbVirtualSingleReadSequence; 
  
   extern function new(string name = "AhbSingleReadTest", uvm_component parent = null);
+  extern virtual function void setupAhbEnvironmentConfig();
   extern virtual task run_phase(uvm_phase phase);
 
 endclass : AhbSingleReadTest
@@ -15,6 +16,10 @@ function AhbSingleReadTest::new(string name = "AhbSingleReadTest",uvm_component 
   super.new(name, parent);
 endfunction : new
 
+function void AhbSingleReadTest::setupAhbEnvironmentConfig();
+ super.setupAhbEnvironmentConfig();
+ ahbEnvironmentConfig.operationMode = READ;
+endfunction : setupAhbEnvironmentConfig
 
 task AhbSingleReadTest::run_phase(uvm_phase phase);
   

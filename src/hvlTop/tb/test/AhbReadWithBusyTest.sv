@@ -7,6 +7,7 @@ class AhbReadWithBusyTest extends AhbBaseTest;
   AhbVirtualReadWithBusySequence ahbVirtualReadWithBusySequence; 
  
   extern function new(string name = "AhbReadWithBusyTest", uvm_component parent = null);
+  extern virtual function void setupAhbEnvironmentConfig();
   extern virtual task run_phase(uvm_phase phase);
 
 endclass : AhbReadWithBusyTest
@@ -15,6 +16,10 @@ function AhbReadWithBusyTest::new(string name = "AhbReadWithBusyTest",uvm_compon
   super.new(name, parent);
 endfunction : new
 
+function void AhbReadWithBusyTest::setupAhbEnvironmentConfig();
+ super.setupAhbEnvironmentConfig();
+ ahbEnvironmentConfig.operationMode = READ;
+endfunction : setupAhbEnvironmentConfig
 
 task AhbReadWithBusyTest::run_phase(uvm_phase phase);
   
