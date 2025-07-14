@@ -6,8 +6,12 @@ module AhbSlaveAgentBFM #(parameter int SLAVE_ID=0) (AhbInterface ahbInterface);
   import uvm_pkg::*;
   `include "uvm_macros.svh"
 
+  string ahbSlaveDriverId;
+  string ahbSlaveMonitorId;
+  string ahbSlaveIdAsci;
+
   initial begin
-    `uvm_info("ahb slave agent bfm",$sformatf("AHB SLAVE AGENT BFM"),UVM_LOW);
+    `uvm_info("ahb slave agent bfm",$sformatf("AHB SLAVE AGENT BFM %0d",SLAVE_ID),UVM_LOW);
   end
   
   AhbSlaveDriverBFM ahbSlaveDriverBFM(.hclk(ahbInterface.hclk),
@@ -58,11 +62,15 @@ module AhbSlaveAgentBFM #(parameter int SLAVE_ID=0) (AhbInterface ahbInterface);
    assign ahbInterface.hready = ahbInterface.hreadyout;
 
   initial begin
-    uvm_config_db#(virtual AhbSlaveDriverBFM)::set(null,"*", "AhbSlaveDriverBFM", ahbSlaveDriverBFM); 
-    uvm_config_db #(virtual AhbSlaveMonitorBFM)::set(null,"*", "AhbSlaveMonitorBFM", ahbSlaveMonitorBFM); 
+    ahbSlaveIdAsci.itoa(SLAVE_ID);
+    ahbSlaveDriverId = {"AhbSlaveDriverBFM" , ahbSlaveIdAsci};
+    ahbSlaveMonitorId = {"AhbSlaveMonitorBFM" , ahbSlaveIdAsci};
+  
+    uvm_config_db#(virtual AhbSlaveDriverBFM)::set(null,"*", ahbSlaveDriverId, ahbSlaveDriverBFM); 
+    uvm_config_db #(virtual AhbSlaveMonitorBFM)::set(null,"*",  ahbSlaveMonitorId, ahbSlaveMonitorBFM); 
   end
 
-
+/*
    bind AhbSlaveMonitorBFM AhbSlaveAssertion ahb_assert (.hclk(ahbInterface.hclk),
                                                          .hresetn(ahbInterface.hresetn),
                                                          .hreadyout(ahbInterface.hreadyout),
@@ -100,7 +108,7 @@ module AhbSlaveAgentBFM #(parameter int SLAVE_ID=0) (AhbInterface ahbInterface);
 							     .hexokay(ahbInterface.hexokay),
 							     .hready(ahbInterface.hready)
                                                             );
-  
+  */
 endmodule : AhbSlaveAgentBFM
 
 `endif

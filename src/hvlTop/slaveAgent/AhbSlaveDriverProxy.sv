@@ -10,6 +10,10 @@ class AhbSlaveDriverProxy extends uvm_driver#(AhbSlaveTransaction);
 
   AhbSlaveAgentConfig ahbSlaveAgentConfig;
 
+  string ahbBfmField;
+  string ahbSlaveIdAsci;
+
+  
   extern function new(string name = "AhbSlaveDriverProxy", uvm_component parent = null);
   extern virtual function void build_phase(uvm_phase phase);
   extern virtual function void connect_phase(uvm_phase phase);
@@ -26,11 +30,12 @@ endfunction : new
 
 function void AhbSlaveDriverProxy::build_phase(uvm_phase phase);
   super.build_phase(phase);
+  /*
   if(!uvm_config_db #(virtual AhbSlaveDriverBFM)::get(this,"","AhbSlaveDriverBFM", ahbSlaveDriverBFM)) 
     begin
     `uvm_fatal("FATAL SDP CANNOT GET SLAVE DRIVER BFM","cannot get() ahbSlaveDriverBFM");
   end
-  
+  */
 endfunction : build_phase
 
 function void AhbSlaveDriverProxy::connect_phase(uvm_phase phase);
@@ -39,11 +44,21 @@ endfunction : connect_phase
 
 function void AhbSlaveDriverProxy::end_of_elaboration_phase(uvm_phase phase);
   super.end_of_elaboration_phase(phase);
-  ahbSlaveDriverBFM.ahbSlaveDriverProxy = this;
+  //ahbSlaveDriverBFM.ahbSlaveDriverProxy = this;
 endfunction : end_of_elaboration_phase
 
 task AhbSlaveDriverProxy::run_phase(uvm_phase phase);
 `uvm_info(get_type_name(), $sformatf(" BEFORERESET \n "), UVM_NONE);
+
+  ahbSlaveIdAsci.itoa(ahbSlaveAgentConfig.ahbSlaveDriverId);
+  ahbBfmField = {"AhbSlaveDriverBFM" ,ahbSlaveIdAsci};
+
+  $display("\n\nTHE SLAVE BFM FIELD IS %s \n \n",ahbBfmField );
+
+  if(!uvm_config_db #(virtual AhbSlaveDriverBFM)::get(this,"",ahbBfmField, ahbSlaveDriverBFM))
+    begin
+    `uvm_fatal("FATAL SDP CANNOT GET SLAVE DRIVER BFM","cannot get() ahbSlaveDriverBFM");
+  end
 
   ahbSlaveDriverBFM.waitForResetn();
   

@@ -8,6 +8,10 @@ class AhbSlaveAgentConfig extends uvm_object;
   uvm_active_passive_enum is_active = UVM_ACTIVE;
   
   bit hasCoverage;
+ 
+  bit ahbSlaveDriverId;
+ 
+  bit ahbSlaveMonitorId;
 
   bit [ADDR_WIDTH-1:0]maximumAddress;
 

@@ -1,13 +1,18 @@
 `ifndef AHBMASTERAGENTBFM_INCLUDED_
 `define AHBMASTERAGENTBFM_INCLUDED_
 
-module AhbMasterAgentBFM(AhbInterface ahbInterface); // Change interface to AhbInterface
+module AhbMasterAgentBFM #(parameter MASTER_ID = 0)(AhbInterface ahbInterface); // Change interface to AhbInterface
 
   import uvm_pkg::*;
   `include "uvm_macros.svh"
-  
+ 
+
+  string ahbMasterDriverId;
+  string ahbMasterMonitorId;
+  string ahbMasterIdAsci;
+ 
   initial begin
-    `uvm_info("ahb master agent bfm", $sformatf("AHB MASTER AGENT BFM"), UVM_LOW);
+    `uvm_info("ahb master agent bfm", $sformatf("AHB MASTER AGENT BFM id is %0d",MASTER_ID), UVM_LOW);
   end
   
   AhbMasterDriverBFM ahbMasterDriverBFM (
@@ -57,10 +62,13 @@ module AhbMasterAgentBFM(AhbInterface ahbInterface); // Change interface to AhbI
   );
 
   initial begin
-    uvm_config_db#(virtual AhbMasterDriverBFM)::set(null,"*","AhbMasterDriverBFM", ahbMasterDriverBFM);
-    uvm_config_db#(virtual AhbMasterMonitorBFM)::set(null,"*","AhbMasterMonitorBFM", ahbMasterMonitorBFM);
+    ahbMasterIdAsci.itoa(MASTER_ID);
+    ahbMasterDriverId  = {"AhbMasterDriverBFM" , ahbMasterIdAsci};
+    ahbMasterMonitorId  = {"AhbMasterMonitorBFM" , ahbMasterIdAsci};
+    uvm_config_db#(virtual AhbMasterDriverBFM)::set(null,"*",ahbMasterDriverId, ahbMasterDriverBFM);
+    uvm_config_db#(virtual AhbMasterMonitorBFM)::set(null,"*",ahbMasterMonitorId, ahbMasterMonitorBFM);
   end
-
+/*
    bind AhbMasterMonitorBFM AhbMasterAssertion ahb_assert (.hclk(ahbInterface.hclk),
                                                          .hresetn(ahbInterface.hresetn),
                                                          .hready(ahbInterface.hready),
@@ -100,6 +108,6 @@ module AhbMasterAgentBFM(AhbInterface ahbInterface); // Change interface to AhbI
 							     .hexokay(ahbInterface.hexokay),
 							     .hready(ahbInterface.hready)
 							     );
- 
+ */
 endmodule : AhbMasterAgentBFM
 `endif

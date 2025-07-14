@@ -6,7 +6,6 @@ module HdlTop;
 
   import uvm_pkg::*;
   `include "uvm_macros.svh"
-  
 
   import AhbGlobalPackage::*;
 
@@ -17,8 +16,17 @@ module HdlTop;
 
   bit hclk;
   bit hresetn;
-
-
+  //bit SLAVE_ID[NO_OF_SLAVES];
+  //bit MASTER_ID[NO_OF_MASTERS];
+/*
+  initial begin 
+    foreach(SLAVE_ID[i])
+      SLAVE_ID[i] = i;
+   
+    foreach(MASTER_ID[i])
+      MASTER_ID[i] = i;
+  end 
+*/
   initial begin
    hclk = 1'b0;
     forever #10 hclk =!hclk;
@@ -35,13 +43,29 @@ module HdlTop;
   end
 
 
-  AhbInterface ahbInterface(hclk,hresetn);
+  AhbInterface ahbInterface[NO_OF_MASTERS-1:0](hclk,hresetn);
 
-  AhbMasterAgentBFM ahbMasterAgentBFM(ahbInterface); 
+  //AhbMasterAgentBFM ahbMasterAgentBFM[NO_OF_MASTERS-1:0](ahbInterface); 
 
- AhbSlaveAgentBFM ahbSlaveAgentBFM(ahbInterface); 
+ //AhbSlaveAgentBFM ahbSlaveAgentBFM[NO_OF_SLAVES-1:0](ahbInterface); 
+
 
   
+  genvar i;
+
+  generate 
+    for(i=0; i < NO_OF_MASTERS ;i++) begin 
+       AhbMasterAgentBFM#(.MASTER_ID(i)) ahbMasterAgentBFM(ahbInterface[i]);
+    end 
+  endgenerate 
+  genvar j;
+
+  generate
+    for(j=0; j < NO_OF_SLAVES ;j++) begin
+       AhbSlaveAgentBFM#(.SLAVE_ID(j)) ahbSlaveAgentBFM(ahbInterface[j]);
+    end
+  endgenerate
+
   initial begin
     $dumpfile("waveform.vcd");
     $dumpvars(0, HdlTop); 

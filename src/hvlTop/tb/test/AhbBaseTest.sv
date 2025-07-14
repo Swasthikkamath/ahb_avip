@@ -26,6 +26,7 @@ function void AhbBaseTest::build_phase(uvm_phase phase);
   super.build_phase(phase);
   setupAhbEnvironmentConfig();
   ahbEnvironment = AhbEnvironment::type_id::create("ahbEnvironment",this);
+  
 endfunction : build_phase
 
 function void AhbBaseTest::setupAhbEnvironmentConfig();
@@ -73,6 +74,8 @@ function void AhbBaseTest::setupAhbMasterAgentConfig();
     else begin
       ahbEnvironmentConfig.ahbMasterAgentConfig[i].is_active = uvm_active_passive_enum'(UVM_PASSIVE);
     end
+    ahbEnvironmentConfig.ahbMasterAgentConfig[i].ahbMasterDriverId = i;
+    ahbEnvironmentConfig.ahbMasterAgentConfig[i].ahbMasterMonitorId = i;
     ahbEnvironmentConfig.ahbMasterAgentConfig[i].hasCoverage = 1; 
   end
 
@@ -87,6 +90,8 @@ function void AhbBaseTest::setupAhbSlaveAgentConfig();
     else begin
       ahbEnvironmentConfig.ahbSlaveAgentConfig[i].is_active = uvm_active_passive_enum'(UVM_PASSIVE);
     end
+    ahbEnvironmentConfig.ahbSlaveAgentConfig[i].ahbSlaveDriverId = i;
+    ahbEnvironmentConfig.ahbSlaveAgentConfig[i].ahbSlaveMonitorId = i;
     ahbEnvironmentConfig.ahbSlaveAgentConfig[i].hasCoverage = 1; 
   end
 

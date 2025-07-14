@@ -4,9 +4,9 @@
 class AhbVirtualWriteSequence extends AhbVirtualBaseSequence;
   `uvm_object_utils(AhbVirtualWriteSequence)
  
-  AhbMasterSequence ahbMasterSequence;
+  AhbMasterSequence ahbMasterSequence[NO_OF_MASTERS];
  
-  AhbSlaveSequence ahbSlaveSequence;
+  AhbSlaveSequence ahbSlaveSequence[NO_OF_SLAVES];
  
   extern function new(string name ="AhbVirtualWriteSequence");
   extern task body();
@@ -19,23 +19,30 @@ endfunction : new
  
 task AhbVirtualWriteSequence::body();
   super.body();
-  ahbMasterSequence = AhbMasterSequence::type_id::create("ahbMasterSequence");
-  ahbSlaveSequence  = AhbSlaveSequence::type_id::create("ahbSlaveSequence");
-  repeat(40) begin 
-    if(!ahbMasterSequence.randomize() with {
-                                                              hsizeSeq dist {BYTE:=1, HALFWORD:=1, WORD:=1};
-							      hwriteSeq ==1;
-                                                              htransSeq == NONSEQ;
-                                                              hburstSeq dist { 2:=1, 3:=1, 4:=1, 5:=2, 6:=2, 7:=2};
- 							      foreach(busyControlSeq[i]) busyControlSeq[i] dist {0:=100, 1:=0};}
-                                                        ) begin
+  foreach(ahbMasterSequence[i]) 
+    ahbMasterSequence[i]= AhbMasterSequence::type_id::create("ahbMasterSequence");
+  foreach(ahbSlaveSequence[i])
+    ahbSlaveSequence[i]  = AhbSlaveSequence::type_id::create("ahbSlaveSequence");
+  foreach(ahbMasterSequence[i])begin : repeat_block 
+    if(!ahbMasterSequence[i].randomize() with { hsizeSeq dist {BYTE:=1, HALFWORD:=1, WORD:=1};
+					     hwriteSeq ==1;
+                                             htransSeq == NONSEQ;
+                                             hburstSeq dist { 2:=1, 3:=1, 4:=1, 5:=2, 6:=2, 7:=2};
+ 					     foreach(busyControlSeq[i]) 
+                                               busyControlSeq[i] dist {0:=100, 1:=0};}
+                                             ) begin : if_block
       `uvm_error(get_type_name(), "Randomization failed : Inside AhbVirtualWriteSequence")
-    end
+    end : if_block
+   end 
+   foreach(ahbSlaveSequence[i])
+     ahbSlaveSequence[i].randomize();
     fork
-       ahbSlaveSequence.start(p_sequencer.ahbSlaveSequencer);
-      ahbMasterSequence.start(p_sequencer.ahbMasterSequencer); 
+      foreach(ahbSlaveSequence[i])
+       ahbSlaveSequence[i].start(p_sequencer.ahbSlaveSequencer[i]);
+      foreach(ahbMasterSequence[i])
+       ahbMasterSequence[i].start(p_sequencer.ahbMasterSequencer[i]); 
     join	
-  end
+ 
 endtask : body
  
 `endif  

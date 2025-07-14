@@ -6,7 +6,6 @@ import AhbGlobalPackage::*;
 interface AhbInterface(input hclk, input hresetn);
   
   logic  [ADDR_WIDTH-1:0] haddr;
-
   logic [NO_OF_SLAVES-1:0] hselx;
   
   logic [2:0] hburst;

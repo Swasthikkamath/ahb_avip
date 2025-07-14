@@ -31,8 +31,9 @@ interface AhbMasterDriverBFM (input  bit   hclk,
 
   AhbMasterDriverProxy ahbMasterDriverProxy;
 
-  initial begin
-    `uvm_info(name, $sformatf(name), UVM_LOW)
+  initial begin : MASTER_DRIVER
+   // `uvm_info(name, $sformatf(name), UVM_LOW)
+    $display("THE MASTER AGENT ARE  CREATED AS EXPECTED %m");
   end
 
   task waitForResetn();

@@ -91,6 +91,8 @@ function void AhbEnvironment::build_phase(uvm_phase phase);
 
     if(ahbEnvironmentConfig.hasVirtualSequencer) begin
       ahbVirtualSequencer = AhbVirtualSequencer::type_id::create("ahbVirtualSequencer",this);
+      ahbVirtualSequencer.ahbMasterSequencer = new[ahbEnvironmentConfig.noOfMasters];
+      ahbVirtualSequencer.ahbSlaveSequencer = new[ahbEnvironmentConfig.noOfSlaves];  
     end
 
     if(ahbEnvironmentConfig.hasScoreboard) begin
@@ -118,10 +120,10 @@ function void AhbEnvironment::connect_phase(uvm_phase phase);
   super.connect_phase(phase);
   if(ahbEnvironmentConfig.hasVirtualSequencer) begin
     foreach(ahbMasterAgent[i]) begin
-      ahbVirtualSequencer.ahbMasterSequencer = ahbMasterAgent[i].ahbMasterSequencer;
+      ahbVirtualSequencer.ahbMasterSequencer[i] = ahbMasterAgent[i].ahbMasterSequencer;
      end
      foreach(ahbSlaveAgent[i]) begin
-       ahbVirtualSequencer.ahbSlaveSequencer = ahbSlaveAgent[i].ahbSlaveSequencer;
+       ahbVirtualSequencer.ahbSlaveSequencer[i] = ahbSlaveAgent[i].ahbSlaveSequencer;
      end
   end
 

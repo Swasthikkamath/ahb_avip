@@ -9,7 +9,11 @@ class AhbMasterMonitorProxy extends uvm_monitor;
   AhbMasterAgentConfig ahbMasterAgentConfig;
 
   uvm_analysis_port#(AhbMasterTransaction) ahbMasterAnalysisPort;
-  
+
+  string ahbBfmField;
+
+  string ahbMasterIdAsci;
+      
   extern function new(string name = "AhbMasterMonitorProxy", uvm_component parent);
   extern virtual function void build_phase(uvm_phase phase);
   extern virtual function void end_of_elaboration_phase(uvm_phase phase);
@@ -24,18 +28,29 @@ endfunction : new
 
 function void AhbMasterMonitorProxy::build_phase(uvm_phase phase);
   super.build_phase(phase);
+
+  /*
   if(!uvm_config_db #(virtual AhbMasterMonitorBFM)::get(this,"","AhbMasterMonitorBFM", ahbMasterMonitorBFM)) begin
     `uvm_fatal("FATAL_MDP_CANNOT_GET_AHB_MASTER_MONITOR_BFM","cannot get() ahbMasterMonitorBFM");
   end
+
+*/
 endfunction : build_phase
 
 function void AhbMasterMonitorProxy::end_of_elaboration_phase(uvm_phase phase);
   super.end_of_elaboration_phase(phase);
-  ahbMasterMonitorBFM.ahbMasterMonitorProxy = this;
+  //ahbMasterMonitorBFM.ahbMasterMonitorProxy = this;
 endfunction : end_of_elaboration_phase
 
 task AhbMasterMonitorProxy::run_phase(uvm_phase phase);
   AhbMasterTransaction ahbMasterPacket;
+  ahbMasterIdAsci.itoa(ahbMasterAgentConfig.ahbMasterMonitorId);
+  ahbBfmField = {"AhbMasterMonitorBFM",ahbMasterIdAsci};
+  
+  if(!uvm_config_db #(virtual AhbMasterMonitorBFM)::get(this,"",ahbBfmField, ahbMasterMonitorBFM)) begin
+    `uvm_fatal("FATAL_MDP_CANNOT_GET_AHB_MASTER_MONITOR_BFM","cannot get() ahbMasterMonitorBFM");
+  end
+
 
   `uvm_info(get_type_name(), $sformatf("Inside the master_monitor_proxy"), UVM_LOW);
   ahbMasterPacket = AhbMasterTransaction::type_id::create("ahbMasterPacket");

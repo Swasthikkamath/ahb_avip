@@ -3,9 +3,9 @@
 
 package AhbGlobalPackage;
 
-  parameter int NO_OF_MASTERS = 1;
+  parameter int NO_OF_MASTERS = 3;
 
-  parameter int NO_OF_SLAVES = 1;
+  parameter int NO_OF_SLAVES = 2;
 
   parameter bit MASTER_AGENT_ACTIVE = 1;
 

@@ -10,6 +10,10 @@ class AhbMasterDriverProxy extends uvm_driver #(AhbMasterTransaction);
 
   AhbMasterAgentConfig ahbMasterAgentConfig;
 
+  string ahbBfmField;
+
+  string ahbMasterIdAsci;
+
   extern function new(string name = "AhbMasterDriverProxy", uvm_component parent);
   extern virtual function void build_phase(uvm_phase phase);
   extern virtual function void connect_phase(uvm_phase phase);
@@ -24,9 +28,10 @@ endfunction : new
 
 function void AhbMasterDriverProxy::build_phase(uvm_phase phase);
   super.build_phase(phase);
+  /*
   if(!uvm_config_db #(virtual AhbMasterDriverBFM)::get(this,"","AhbMasterDriverBFM", ahbMasterDriverBFM)) begin
     `uvm_fatal("FATAL_MDP_CANNOT_GET_APB_MASTER_DRIVER_BFM","cannot get() ahbMasterDriverBFM");
-  end
+  end*/
 endfunction : build_phase
 
 function void AhbMasterDriverProxy::connect_phase(uvm_phase phase);
@@ -36,13 +41,22 @@ endfunction : connect_phase
 function void AhbMasterDriverProxy::end_of_elaboration_phase(uvm_phase phase);
   super.end_of_elaboration_phase(phase);
 
-  ahbMasterDriverBFM.ahbMasterDriverProxy = this;
+  //ahbMasterDriverBFM.ahbMasterDriverProxy = this;
 
 endfunction : end_of_elaboration_phase
 
 task AhbMasterDriverProxy::run_phase(uvm_phase phase);
 
-  ahbMasterDriverBFM.waitForResetn();
+  ahbMasterIdAsci.itoa( ahbMasterAgentConfig.ahbMasterDriverId);
+
+  ahbBfmField = {"AhbMasterDriverBFM" , ahbMasterIdAsci};
+
+  if(!uvm_config_db #(virtual AhbMasterDriverBFM)::get(this,"" ,ahbBfmField  ,  ahbMasterDriverBFM)) begin
+    `uvm_fatal("FATAL_MDP_CANNOT_GET_APB_MASTER_DRIVER_BFM","cannot get() ahbMasterDriverBFM");
+  end
+  
+ 
+   ahbMasterDriverBFM.waitForResetn();
 
   forever begin
 

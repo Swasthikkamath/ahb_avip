@@ -4,9 +4,9 @@
 class AhbVirtualSingleWriteSequence extends AhbVirtualBaseSequence;
   `uvm_object_utils(AhbVirtualSingleWriteSequence)
  
-  AhbMasterSequence ahbMasterSequence;
+  AhbMasterSequence ahbMasterSequence[NO_OF_MASTERS];
  
-  AhbSlaveSequence ahbSlaveSequence;
+  AhbSlaveSequence ahbSlaveSequence[NO_OF_SLAVES];
  
   extern function new(string name ="AhbVirtualSingleWriteSequence");
   extern task body();
@@ -19,10 +19,16 @@ endfunction : new
  
 task AhbVirtualSingleWriteSequence::body();
   super.body();
-  ahbMasterSequence = AhbMasterSequence::type_id::create("ahbMasterSequence");
-  ahbSlaveSequence  = AhbSlaveSequence::type_id::create("ahbSlaveSequence");
-  repeat(40) begin 
-    if(!ahbMasterSequence.randomize() with {
+  foreach(ahbMasterSequence[i])
+    ahbMasterSequence[i]= AhbMasterSequence::type_id::create("ahbMasterSequence");
+  
+  foreach(ahbSlaveSequence[i]) begin
+    ahbSlaveSequence[i]  = AhbSlaveSequence::type_id::create("ahbSlaveSequence");
+    ahbSlaveSequence[i].randomize();
+  end 
+  
+  foreach(ahbMasterSequence[i])begin 
+    if(!ahbMasterSequence[i].randomize() with {
                                                               hsizeSeq dist {BYTE:=1, HALFWORD:=1, WORD:=1};
 							      hwriteSeq ==1;
                                                               htransSeq == NONSEQ;
@@ -32,11 +38,13 @@ task AhbVirtualSingleWriteSequence::body();
                                                         ) begin
        `uvm_error(get_type_name(), "Randomization failed : Inside AhbVirtualSingleWriteSequence")
     end
+   end 
     fork
-       ahbSlaveSequence.start(p_sequencer.ahbSlaveSequencer);
-      ahbMasterSequence.start(p_sequencer.ahbMasterSequencer); 
+       foreach(ahbMasterSequence[i])
+         ahbMasterSequence[i].start(p_sequencer.ahbMasterSequencer[i]);
+       foreach(ahbSlaveSequence[i])
+       ahbSlaveSequence[i].start(p_sequencer.ahbSlaveSequencer[i]);
     join	
-  end
 endtask : body
  
 `endif  

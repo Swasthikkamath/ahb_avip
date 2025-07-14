@@ -7,7 +7,11 @@ class AhbMasterAgentConfig extends uvm_object;
   uvm_active_passive_enum is_active = UVM_ACTIVE;  
 
   bit hasCoverage;
-
+  
+  bit ahbMasterDriverId;
+  
+  bit ahbMasterMonitorId;
+ 
   bit [ADDR_WIDTH-1:0]haddr;
 
   bit [MEMORY_WIDTH-1:0]masterMemory[(SLAVE_MEMORY_SIZE+SLAVE_MEMORY_GAP)*NO_OF_SLAVES:0];
