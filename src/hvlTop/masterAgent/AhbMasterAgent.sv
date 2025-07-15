@@ -60,11 +60,13 @@ function void AhbMasterAgent::build_phase(uvm_phase phase);
   super.build_phase(phase);
   if(ahbMasterAgentConfig.is_active == UVM_ACTIVE) begin
     ahbMasterSequencer = AhbMasterSequencer::type_id::create("ahbMasterSequencer",this);
+     $display("THE CONFIG IS %0d",ahbMasterAgentConfig);  
     ahbMasterDriverProxy = AhbMasterDriverProxy::type_id::create("ahbMasterDriverProxy",this);
+    ahbMasterDriverProxy.setConfig(ahbMasterAgentConfig);
   end
-
+  
   ahbMasterMonitorProxy = AhbMasterMonitorProxy::type_id::create("ahbMasterMonitorProxy",this);
-
+  ahbMasterMonitorProxy.setConfig(ahbMasterAgentConfig);
   if(ahbMasterAgentConfig.hasCoverage) begin
     ahbMasterCoverage = AhbMasterCoverage::type_id::create("ahbMasterCoverage",this);
   end
@@ -80,15 +82,11 @@ endfunction : build_phase
     //--------------------------------------------------------------------------------------------
 function void AhbMasterAgent::connect_phase(uvm_phase phase);
   if(ahbMasterAgentConfig.is_active == UVM_ACTIVE) begin
-    ahbMasterDriverProxy.ahbMasterAgentConfig = ahbMasterAgentConfig;
     ahbMasterSequencer.ahbMasterAgentConfig = ahbMasterAgentConfig;
 
     //Connecting AhbSlaveDriverProxy port to AhbSlaveSequencer export
     ahbMasterDriverProxy.seq_item_port.connect(ahbMasterSequencer.seq_item_export);
   end
-  ahbMasterMonitorProxy.ahbMasterAgentConfig = ahbMasterAgentConfig;
-
-  ahbMasterMonitorProxy.ahbMasterAgentConfig = ahbMasterAgentConfig;
 
   if(ahbMasterAgentConfig.hasCoverage) begin
     ahbMasterCoverage.ahbMasterAgentConfig = ahbMasterAgentConfig;

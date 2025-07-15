@@ -35,25 +35,25 @@ function void AhbSlaveAgent::build_phase(uvm_phase phase);
   if(ahbSlaveAgentConfig.hasCoverage) begin
     ahbSlaveCoverage = AhbSlaveCoverage::type_id::create("ahbSlaveCoverage",this);
   end
-  
-endfunction : build_phase
-    
-function void AhbSlaveAgent::connect_phase(uvm_phase phase);
-      
- if(ahbSlaveAgentConfig.is_active == UVM_ACTIVE) begin
-   ahbSlaveDriverProxy.ahbSlaveAgentConfig = ahbSlaveAgentConfig;
+
+  if(ahbSlaveAgentConfig.is_active == UVM_ACTIVE) begin
+   ahbSlaveDriverProxy.setConfig(ahbSlaveAgentConfig);
    ahbSlaveSequencer.ahbSlaveAgentConfig = ahbSlaveAgentConfig;
    ahbSlaveDriverProxy.seq_item_port.connect(ahbSlaveSequencer.seq_item_export);
  end
-      
- ahbSlaveMonitorProxy.ahbSlaveAgentConfig = ahbSlaveAgentConfig;
- ahbSlaveMonitorProxy.ahbSlaveAgentConfig = ahbSlaveAgentConfig;
+
+ ahbSlaveMonitorProxy.setConfig(ahbSlaveAgentConfig);
 
  if(ahbSlaveAgentConfig.hasCoverage) begin
    ahbSlaveCoverage.ahbSlaveAgentConfig = ahbSlaveAgentConfig;
    ahbSlaveMonitorProxy.ahbSlaveAnalysisPort.connect(ahbSlaveCoverage.analysis_export);
  end
+
   
+endfunction : build_phase
+    
+function void AhbSlaveAgent::connect_phase(uvm_phase phase);
+    super.connect_phase(phase); 
 endfunction : connect_phase
 
 `endif

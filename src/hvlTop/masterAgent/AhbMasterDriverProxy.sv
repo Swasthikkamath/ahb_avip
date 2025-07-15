@@ -19,8 +19,9 @@ class AhbMasterDriverProxy extends uvm_driver #(AhbMasterTransaction);
   extern virtual function void connect_phase(uvm_phase phase);
   extern virtual function void end_of_elaboration_phase(uvm_phase phase);
   extern virtual task run_phase(uvm_phase phase);
- 
+  extern function void setConfig(AhbMasterAgentConfig ahbMasterAgentConfig); 
 endclass : AhbMasterDriverProxy
+
  
 function AhbMasterDriverProxy::new(string name = "AhbMasterDriverProxy",uvm_component parent);
   super.new(name, parent);
@@ -28,15 +29,13 @@ endfunction : new
 
 function void AhbMasterDriverProxy::build_phase(uvm_phase phase);
   super.build_phase(phase);
-  /*
-  if(!uvm_config_db #(virtual AhbMasterDriverBFM)::get(this,"","AhbMasterDriverBFM", ahbMasterDriverBFM)) begin
+ /* 
+  if(!uvm_config_db #(virtual AhbMasterDriverBFM)::get(this,"",ahbMasterConfig.ahbBfmField, ahbMasterDriverBFM)) begin
     `uvm_fatal("FATAL_MDP_CANNOT_GET_APB_MASTER_DRIVER_BFM","cannot get() ahbMasterDriverBFM");
-  end*/
+  end
+*/
 endfunction : build_phase
 
-function void AhbMasterDriverProxy::connect_phase(uvm_phase phase);
-  super.connect_phase(phase);
-endfunction : connect_phase
 
 function void AhbMasterDriverProxy::end_of_elaboration_phase(uvm_phase phase);
   super.end_of_elaboration_phase(phase);
@@ -46,7 +45,7 @@ function void AhbMasterDriverProxy::end_of_elaboration_phase(uvm_phase phase);
 endfunction : end_of_elaboration_phase
 
 task AhbMasterDriverProxy::run_phase(uvm_phase phase);
-
+/*
   ahbMasterIdAsci.itoa( ahbMasterAgentConfig.ahbMasterDriverId);
 
   ahbBfmField = {"AhbMasterDriverBFM" , ahbMasterIdAsci};
@@ -54,7 +53,7 @@ task AhbMasterDriverProxy::run_phase(uvm_phase phase);
   if(!uvm_config_db #(virtual AhbMasterDriverBFM)::get(this,"" ,ahbBfmField  ,  ahbMasterDriverBFM)) begin
     `uvm_fatal("FATAL_MDP_CANNOT_GET_APB_MASTER_DRIVER_BFM","cannot get() ahbMasterDriverBFM");
   end
-  
+ */ 
  
    ahbMasterDriverBFM.waitForResetn();
 
@@ -79,6 +78,16 @@ task AhbMasterDriverProxy::run_phase(uvm_phase phase);
   end
 
 endtask : run_phase
+
+function void AhbMasterDriverProxy :: connect_phase(uvm_phase phase);
+  super.connect_phase(phase);
+  ahbMasterDriverBFM = ahbMasterAgentConfig.ahbMasterDriverBfm;
+endfunction  : connect_phase
+
+function void AhbMasterDriverProxy :: setConfig( AhbMasterAgentConfig ahbMasterAgentConfig );
+   this.ahbMasterAgentConfig = ahbMasterAgentConfig;
+endfunction : setConfig
+
  
 `endif
 

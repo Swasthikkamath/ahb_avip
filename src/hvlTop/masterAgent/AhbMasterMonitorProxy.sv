@@ -18,7 +18,8 @@ class AhbMasterMonitorProxy extends uvm_monitor;
   extern virtual function void build_phase(uvm_phase phase);
   extern virtual function void end_of_elaboration_phase(uvm_phase phase);
   extern virtual task run_phase(uvm_phase phase);
-
+  extern virtual function void connect_phase(uvm_phase phase);
+  extern function void setConfig(AhbMasterAgentConfig ahbMasterAgentConfig);
 endclass : AhbMasterMonitorProxy
 
 function AhbMasterMonitorProxy::new(string name = "AhbMasterMonitorProxy",uvm_component parent);
@@ -30,11 +31,11 @@ function void AhbMasterMonitorProxy::build_phase(uvm_phase phase);
   super.build_phase(phase);
 
   /*
-  if(!uvm_config_db #(virtual AhbMasterMonitorBFM)::get(this,"","AhbMasterMonitorBFM", ahbMasterMonitorBFM)) begin
+  if(!uvm_config_db #(virtual AhbMasterMonitorBFM)::get(this,"",, ahbMasterMonitorBFM)) begin
     `uvm_fatal("FATAL_MDP_CANNOT_GET_AHB_MASTER_MONITOR_BFM","cannot get() ahbMasterMonitorBFM");
   end
-
 */
+
 endfunction : build_phase
 
 function void AhbMasterMonitorProxy::end_of_elaboration_phase(uvm_phase phase);
@@ -44,13 +45,13 @@ endfunction : end_of_elaboration_phase
 
 task AhbMasterMonitorProxy::run_phase(uvm_phase phase);
   AhbMasterTransaction ahbMasterPacket;
-  ahbMasterIdAsci.itoa(ahbMasterAgentConfig.ahbMasterMonitorId);
+ /* ahbMasterIdAsci.itoa(ahbMasterAgentConfig.ahbMasterMonitorId);
   ahbBfmField = {"AhbMasterMonitorBFM",ahbMasterIdAsci};
   
   if(!uvm_config_db #(virtual AhbMasterMonitorBFM)::get(this,"",ahbBfmField, ahbMasterMonitorBFM)) begin
     `uvm_fatal("FATAL_MDP_CANNOT_GET_AHB_MASTER_MONITOR_BFM","cannot get() ahbMasterMonitorBFM");
   end
-
+*/
 
   `uvm_info(get_type_name(), $sformatf("Inside the master_monitor_proxy"), UVM_LOW);
   ahbMasterPacket = AhbMasterTransaction::type_id::create("ahbMasterPacket");
@@ -74,5 +75,14 @@ task AhbMasterMonitorProxy::run_phase(uvm_phase phase);
   end
 
 endtask : run_phase
+
+function void AhbMasterMonitorProxy :: connect_phase(uvm_phase phase);
+  super.connect_phase(phase);
+  ahbMasterMonitorBFM = ahbMasterAgentConfig.ahbMasterMonitorBfm;
+endfunction  : connect_phase
+
+function void AhbMasterMonitorProxy :: setConfig( AhbMasterAgentConfig ahbMasterAgentConfig);
+   this.ahbMasterAgentConfig = ahbMasterAgentConfig;
+endfunction : setConfig
 
 `endif

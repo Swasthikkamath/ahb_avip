@@ -19,6 +19,10 @@ class AhbSlaveAgentConfig extends uvm_object;
   
   bit [7:0]slaveMemory[longint];
 
+  virtual AhbSlaveDriverBFM ahbSlaveDriverBfm;
+  
+  virtual AhbSlaveMonitorBFM ahbSlaveMonitorBfm;
+ 
   bit [DATA_WIDTH-1:0]haddr;
   rand int noOfWaitStates; 
 

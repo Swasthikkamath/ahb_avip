@@ -17,7 +17,9 @@ class AhbSlaveMonitorProxy extends uvm_monitor;
   extern virtual function void build_phase(uvm_phase phase);
   extern virtual function void end_of_elaboration_phase(uvm_phase phase);
   extern virtual task run_phase(uvm_phase phase);
-
+  extern function void setConfig(AhbSlaveAgentConfig ahbSlaveAgentConfig);
+  extern virtual function void connect_phase(uvm_phase phase);
+    
 endclass : AhbSlaveMonitorProxy
 
 function AhbSlaveMonitorProxy::new(string name = "AhbSlaveMonitorProxy",uvm_component parent);
@@ -27,11 +29,11 @@ endfunction : new
 
 function void AhbSlaveMonitorProxy::build_phase(uvm_phase phase);
   super.build_phase(phase);
-  /*    
+/*   
   if(!uvm_config_db #(virtual AhbSlaveMonitorBFM)::get(this,"","AhbSlaveMonitorBFM", ahbSlaveMonitorBFM)) begin
     `uvm_fatal("FATAL MDP CANNOT GET AHBSLAVE MONITOR BFM","cannot get() ahbSlaveMonitorBFM");
   end
-  */    
+ */    
 endfunction : build_phase
 
 function void AhbSlaveMonitorProxy::end_of_elaboration_phase(uvm_phase phase);
@@ -42,7 +44,7 @@ endfunction : end_of_elaboration_phase
 task AhbSlaveMonitorProxy::run_phase(uvm_phase phase);
       
   AhbSlaveTransaction ahbSlavePacket;
-  
+  /*
   ahbSlaveIdAsci.itoa(ahbSlaveAgentConfig.ahbSlaveMonitorId);
   
   ahbBfmField = {"AhbSlaveMonitorBFM" , ahbSlaveIdAsci};
@@ -51,7 +53,7 @@ task AhbSlaveMonitorProxy::run_phase(uvm_phase phase);
   if(!uvm_config_db #(virtual AhbSlaveMonitorBFM)::get(this,"",ahbBfmField, ahbSlaveMonitorBFM)) begin
     `uvm_fatal("FATAL MDP CANNOT GET AHBSLAVE MONITOR BFM","cannot get() ahbSlaveMonitorBFM");
   end
-
+*/
   ahbSlavePacket = AhbSlaveTransaction::type_id::create("slave Packet");
 
   ahbSlaveMonitorBFM.waitForResetn();
@@ -74,5 +76,14 @@ task AhbSlaveMonitorProxy::run_phase(uvm_phase phase);
   end
 
 endtask : run_phase
+
+function void AhbSlaveMonitorProxy :: connect_phase(uvm_phase phase);
+  super.connect_phase(phase);
+  ahbSlaveMonitorBFM = ahbSlaveAgentConfig.ahbSlaveMonitorBfm;
+endfunction  : connect_phase
+
+function void AhbSlaveMonitorProxy :: setConfig( AhbSlaveAgentConfig ahbSlaveAgentConfig);
+   this.ahbSlaveAgentConfig = ahbSlaveAgentConfig;
+endfunction : setConfig
 
 `endif

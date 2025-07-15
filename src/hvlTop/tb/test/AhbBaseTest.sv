@@ -8,6 +8,15 @@ class AhbBaseTest extends uvm_test;
 
   AhbEnvironmentConfig ahbEnvironmentConfig;
 
+  string slaveIdAsci;
+  string masterIdAsci;
+
+  string slaveDriverBfmField;
+  string slaveMonitorBfmField;
+  
+  string masterDriverBfmField;
+  string masterMonitorBfmField;
+
   extern function new(string name = "AhbBaseTest", uvm_component parent = null);
   extern virtual function void build_phase(uvm_phase phase);
   extern virtual function void setupAhbEnvironmentConfig();
@@ -68,14 +77,22 @@ endfunction : setupAhbEnvironmentConfig
 function void AhbBaseTest::setupAhbMasterAgentConfig();
   
   foreach(ahbEnvironmentConfig.ahbMasterAgentConfig[i]) begin
+    masterIdAsci.itoa(i);
     if(MASTER_AGENT_ACTIVE === 1) begin
       ahbEnvironmentConfig.ahbMasterAgentConfig[i].is_active = uvm_active_passive_enum'(UVM_ACTIVE);
+      masterDriverBfmField = {"AhbMasterDriverBFM",masterIdAsci};
+      $display("THE MASTER FIELD IS %s " ,masterDriverBfmField);
+      if(!uvm_config_db #(virtual AhbMasterDriverBFM)::get(this,"",masterDriverBfmField, ahbEnvironmentConfig.ahbMasterAgentConfig[i].ahbMasterDriverBfm)) begin
+        `uvm_fatal("FATAL SDP CANNOT GET MASTER DRIVER BFM","cannot get() ahbMasterDriverBFM");
+      end
     end
     else begin
       ahbEnvironmentConfig.ahbMasterAgentConfig[i].is_active = uvm_active_passive_enum'(UVM_PASSIVE);
     end
-    ahbEnvironmentConfig.ahbMasterAgentConfig[i].ahbMasterDriverId = i;
-    ahbEnvironmentConfig.ahbMasterAgentConfig[i].ahbMasterMonitorId = i;
+    masterMonitorBfmField = {"AhbMasterMonitorBFM",masterIdAsci}; 
+    if(!uvm_config_db #(virtual AhbMasterMonitorBFM)::get(this,"",masterMonitorBfmField,ahbEnvironmentConfig.ahbMasterAgentConfig[i].ahbMasterMonitorBfm)) begin
+        `uvm_fatal("FATAL SDP CANNOT GET MASTER DRIVER BFM","cannot get() ahbSlaveDriverBFM");
+    end
     ahbEnvironmentConfig.ahbMasterAgentConfig[i].hasCoverage = 1; 
   end
 
@@ -84,14 +101,22 @@ endfunction : setupAhbMasterAgentConfig
 function void AhbBaseTest::setupAhbSlaveAgentConfig();
   
   foreach(ahbEnvironmentConfig.ahbSlaveAgentConfig[i]) begin
+    slaveIdAsci.itoa(i);
     if(SLAVE_AGENT_ACTIVE === 1) begin
       ahbEnvironmentConfig.ahbSlaveAgentConfig[i].is_active = uvm_active_passive_enum'(UVM_ACTIVE);
+      slaveDriverBfmField = {"AhbSlaveDriverBFM",slaveIdAsci};
+      $display("THE FIELD IS %s",slaveDriverBfmField);
+      if(!uvm_config_db #(virtual AhbSlaveDriverBFM)::get(this,"",slaveDriverBfmField, ahbEnvironmentConfig.ahbSlaveAgentConfig[i].ahbSlaveDriverBfm)) begin
+        `uvm_fatal("FATAL SDP CANNOT GET SLAVE DRIVER BFM","cannot get() ahbSlaveDriverBFM");
+      end
     end
     else begin
       ahbEnvironmentConfig.ahbSlaveAgentConfig[i].is_active = uvm_active_passive_enum'(UVM_PASSIVE);
     end
-    ahbEnvironmentConfig.ahbSlaveAgentConfig[i].ahbSlaveDriverId = i;
-    ahbEnvironmentConfig.ahbSlaveAgentConfig[i].ahbSlaveMonitorId = i;
+    slaveMonitorBfmField = {"AhbSlaveMonitorBFM",slaveIdAsci};
+    if(!uvm_config_db #(virtual AhbSlaveMonitorBFM)::get(this,"",slaveMonitorBfmField, ahbEnvironmentConfig.ahbSlaveAgentConfig[i].ahbSlaveMonitorBfm)) begin
+        `uvm_fatal("FATAL SDP CANNOT GET SLAVE DRIVER BFM","cannot get() ahbSlaveDriverBFM");
+    end
     ahbEnvironmentConfig.ahbSlaveAgentConfig[i].hasCoverage = 1; 
   end
 

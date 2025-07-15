@@ -10,17 +10,18 @@ class AhbSlaveDriverProxy extends uvm_driver#(AhbSlaveTransaction);
 
   AhbSlaveAgentConfig ahbSlaveAgentConfig;
 
-  string ahbBfmField;
   string ahbSlaveIdAsci;
 
   
   extern function new(string name = "AhbSlaveDriverProxy", uvm_component parent = null);
   extern virtual function void build_phase(uvm_phase phase);
-  extern virtual function void connect_phase(uvm_phase phase);
   extern function void end_of_elaboration_phase(uvm_phase phase);
   extern virtual task run_phase(uvm_phase phase);
   extern virtual task taskWrite(inout ahbTransferCharStruct structPacket);
   extern virtual task taskRead(inout ahbTransferCharStruct structPacket);
+  extern virtual function void connect_phase(uvm_phase phase);
+  extern function void setConfig( AhbSlaveAgentConfig ahbSlaveAgentConfig);
+
 
 endclass : AhbSlaveDriverProxy
 
@@ -30,17 +31,14 @@ endfunction : new
 
 function void AhbSlaveDriverProxy::build_phase(uvm_phase phase);
   super.build_phase(phase);
-  /*
-  if(!uvm_config_db #(virtual AhbSlaveDriverBFM)::get(this,"","AhbSlaveDriverBFM", ahbSlaveDriverBFM)) 
+/*  
+  if(!uvm_config_db #(virtual AhbSlaveDriverBFM)::get(this,"",ahbSlaveConfig.ahbBfmField, ahbSlaveDriverBFM)) 
     begin
     `uvm_fatal("FATAL SDP CANNOT GET SLAVE DRIVER BFM","cannot get() ahbSlaveDriverBFM");
   end
-  */
+ */
 endfunction : build_phase
 
-function void AhbSlaveDriverProxy::connect_phase(uvm_phase phase);
-  super.connect_phase(phase);
-endfunction : connect_phase
 
 function void AhbSlaveDriverProxy::end_of_elaboration_phase(uvm_phase phase);
   super.end_of_elaboration_phase(phase);
@@ -49,7 +47,7 @@ endfunction : end_of_elaboration_phase
 
 task AhbSlaveDriverProxy::run_phase(uvm_phase phase);
 `uvm_info(get_type_name(), $sformatf(" BEFORERESET \n "), UVM_NONE);
-
+/*
   ahbSlaveIdAsci.itoa(ahbSlaveAgentConfig.ahbSlaveDriverId);
   ahbBfmField = {"AhbSlaveDriverBFM" ,ahbSlaveIdAsci};
 
@@ -59,7 +57,7 @@ task AhbSlaveDriverProxy::run_phase(uvm_phase phase);
     begin
     `uvm_fatal("FATAL SDP CANNOT GET SLAVE DRIVER BFM","cannot get() ahbSlaveDriverBFM");
   end
-
+*/
   ahbSlaveDriverBFM.waitForResetn();
   
   forever begin
@@ -128,6 +126,15 @@ task AhbSlaveDriverProxy::taskRead(inout ahbTransferCharStruct structPacket);
       structPacket.hrdata  = 'h0;
   end
 endtask : taskRead
-    
+
+
+function void AhbSlaveDriverProxy :: connect_phase(uvm_phase phase);
+  super.connect_phase(phase);
+  ahbSlaveDriverBFM = ahbSlaveAgentConfig.ahbSlaveDriverBfm;
+endfunction  : connect_phase
+
+function void AhbSlaveDriverProxy :: setConfig( AhbSlaveAgentConfig ahbSlaveAgentConfig);
+   this.ahbSlaveAgentConfig = ahbSlaveAgentConfig;
+endfunction : setConfig    
 
 `endif
