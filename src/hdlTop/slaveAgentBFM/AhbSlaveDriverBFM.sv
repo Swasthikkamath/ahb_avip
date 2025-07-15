@@ -29,8 +29,20 @@ interface AhbSlaveDriverBFM (input  bit   hclk,
  
   `include "uvm_macros.svh"
   import uvm_pkg::*;
+
+  `ifdef slaveStatusRegister 
+      reg[7:0]slaveStatusRegister[STATUSREGISTERWIDTH-1:0];
+  
+  `ifdef slaveControlRegister 
+       reg[7:0]slaveControlRegister[CONTROLREGISTERWIDTH-1:0]; 
  
- 
+  `ifdef slaveDataRegister
+       reg[7:0]slaveControlRegister[DATAREGISTERWIDTH-1:0];
+
+ `ifdef slaveInstructionRegister
+       reg[7:0]slaveControlRegister[INSTRUCTIONREGISTERWIDTH-1:0]; 
+
+  
   string name = "AHB_SLAVE_DRIVER_BFM";
  
   AhbSlaveDriverProxy ahbSlaveDriverProxy ;

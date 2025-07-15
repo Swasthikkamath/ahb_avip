@@ -27,6 +27,15 @@ package AhbGlobalPackage;
 
   parameter int LENGTH = 4;
 
+  parameter STATUSREGISTERWIDTH = 1024;
+
+  parameter DATAREGISTERWIDTH = 1024;
+
+  parameter CONTROLREGISTERWIDTH = 1024;
+
+  parameter INSTRUCTIONREGISTERWIDTH = 1024;
+
+
   typedef enum logic [2:0] {
     SINGLE      = 3'b000,
     INCR        = 3'b001,
