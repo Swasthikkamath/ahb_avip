@@ -33,9 +33,7 @@ task AhbSingleWriteTest::run_phase(uvm_phase phase);
  `uvm_info(get_type_name(),$sformatf("AhbSingleWriteTest"),UVM_LOW);
   phase.raise_objection(this);
   ahbVirtualSingleWriteSequence.start(ahbEnvironment.ahbVirtualSequencer);
- $display("\n\n\n HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE ***************************** \n\n\n");
   #10;
-  //$display("\n\n\n HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE ***************************** \n\n\n");
   phase.drop_objection(this);
 
 endtask : run_phase

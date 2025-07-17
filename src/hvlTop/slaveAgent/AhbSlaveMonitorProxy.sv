@@ -72,7 +72,7 @@ task AhbSlaveMonitorProxy::run_phase(uvm_phase phase);
 
     $cast(ahbSlaveClonePacket, ahbSlavePacket.clone());
 //    `uvm_info(get_type_name(),$sformatf("Sending packet via analysis_port: , \n %s", ahbSlaveClonePacket.sprint()),UVM_HIGH)
-    ahbSlaveAnalysisPort.write(ahbSlaveClonePacket);
+//    ahbSlaveAnalysisPort.write(ahbSlaveClonePacket);
   end
 
 endtask : run_phase

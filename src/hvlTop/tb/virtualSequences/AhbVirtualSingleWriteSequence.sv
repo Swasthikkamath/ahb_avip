@@ -41,11 +41,20 @@ task AhbVirtualSingleWriteSequence::body();
    end 
     fork
        $display("ENTERED FORK &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-       foreach(ahbMasterSequence[i])
-         ahbMasterSequence[i].start(p_sequencer.ahbMasterSequencer[i]);
-       foreach(ahbSlaveSequence[i])
-         ahbSlaveSequence[i].start(p_sequencer.ahbSlaveSequencer[i]);
-    join
+       foreach(ahbMasterSequence[i]) begin 
+         fork
+            automatic int j = i;
+            ahbMasterSequence[j].start(p_sequencer.ahbMasterSequencer[j]);
+         join_none 
+       end 
+       foreach(ahbSlaveSequence[i]) begin
+         fork
+          automatic int j =i;
+          ahbSlaveSequence[j].start(p_sequencer.ahbSlaveSequencer[j]);
+         join_none
+        end 
+     join
+    wait fork;
    $display("\n\n\n HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE ***************************** \n\n\n");	
 endtask : body
  

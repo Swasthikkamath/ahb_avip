@@ -14,7 +14,7 @@ module AhbSlaveAgentBFM #(parameter int SLAVE_ID=0) (AhbInterface ahbInterface);
     `uvm_info("ahb slave agent bfm",$sformatf("AHB SLAVE AGENT BFM %0d",SLAVE_ID),UVM_LOW);
   end
   
-  AhbSlaveDriverBFM ahbSlaveDriverBFM(.hclk(ahbInterface.hclk),
+  AhbSlaveDriverBFM           ahbSlaveDriverBFM(.hclk(ahbInterface.hclk),
                                            .hresetn(ahbInterface.hresetn),
                                            .hburst(ahbInterface.hburst),
                                            .hmastlock(ahbInterface.hmastlock),
@@ -59,7 +59,6 @@ module AhbSlaveAgentBFM #(parameter int SLAVE_ID=0) (AhbInterface ahbInterface);
                                            .hselx(ahbInterface.hselx)
                                           );
  
-   assign ahbInterface.hready = ahbInterface.hreadyout;
 
   initial begin
     ahbSlaveIdAsci.itoa(SLAVE_ID);

@@ -1,5 +1,5 @@
 $date
-	Thu Jul 17 21:02:25 2025
+	Thu Jul 17 22:52:30 2025
 $end
 $version
 	QuestaSim Version 10.6c
@@ -12,7 +12,7 @@ $scope module HdlTop $end
 $var reg 1 ! hclk $end
 $var reg 1 " hresetn $end
 
-$scope begin genblk2[0] $end
+$scope begin genblk2[1] $end
 $var parameter 32 # j $end
 
 $scope module ahbSlaveAgentBFM $end
@@ -20,11 +20,27 @@ $var parameter 32 $ SLAVE_ID $end
 $upscope $end
 $upscope $end
 
-$scope begin genblk1[0] $end
-$var parameter 32 % i $end
+$scope begin genblk2[0] $end
+$var parameter 32 % j $end
+
+$scope module ahbSlaveAgentBFM $end
+$var parameter 32 & SLAVE_ID $end
+$upscope $end
+$upscope $end
+
+$scope begin genblk1[1] $end
+$var parameter 32 ' i $end
 
 $scope module ahbMasterAgentBFM $end
-$var parameter 32 & MASTER_ID $end
+$var parameter 32 ( MASTER_ID $end
+$upscope $end
+$upscope $end
+
+$scope begin genblk1[0] $end
+$var parameter 32 ) i $end
+
+$scope module ahbMasterAgentBFM $end
+$var parameter 32 * MASTER_ID $end
 $upscope $end
 $upscope $end
 $upscope $end
@@ -33,10 +49,14 @@ $enddefinitions $end
 $dumpvars
 0!
 1"
+b0 )
+b0 *
+b1 '
+b1 (
 b0 %
 b0 &
-b0 #
-b0 $
+b1 #
+b1 $
 $end
 #5
 1!
@@ -56,17 +76,3 @@ $end
 1!
 #40
 0!
-#45
-1!
-#50
-0!
-#55
-1!
-#60
-0!
-#65
-1!
-#70
-0!
-#75
-1!

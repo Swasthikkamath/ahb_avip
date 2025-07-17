@@ -1,5 +1,5 @@
 QuestaSim vlog 10.6c Compiler 2017.07 Jul 25 2017
-Start time: 21:02:01 on Jul 17,2025
+Start time: 22:52:05 on Jul 17,2025
 vlog -sv "+acc" "+cover" "+fcover" -l ahb_compile.log -f ../ahb_compile.f 
 -- Compiling package AhbGlobalPackage
 -- Compiling package AhbMasterPackage
@@ -24,7 +24,7 @@ vlog -sv "+acc" "+cover" "+fcover" -l ahb_compile.log -f ../ahb_compile.f
 -- Compiling package AhbInterconnect_sv_unit
 -- Importing package AhbGlobalPackage
 -- Compiling interface AhbInterconnect
-** Warning: ../../src/hdlTop/interconnect/AhbInterconnect.sv(10): (vlog-2583) [SVCHK] - Some checking for conflicts with always_comb and always_latch variables not yet supported. Run vopt to provide additional design-level checks.
+** Warning: ../../src/hdlTop/interconnect/AhbInterconnect.sv(12): (vlog-2583) [SVCHK] - Some checking for conflicts with always_comb and always_latch variables not yet supported. Run vopt to provide additional design-level checks.
 -- Compiling package AhbMasterDriverBFM_sv_unit
 -- Importing package AhbGlobalPackage
 -- Compiling interface AhbMasterDriverBFM
@@ -75,5 +75,5 @@ vlog -sv "+acc" "+cover" "+fcover" -l ahb_compile.log -f ../ahb_compile.f
 Top level modules:
 	HdlTop
 	HvlTop
-End time: 21:02:05 on Jul 17,2025, Elapsed time: 0:00:04
+End time: 22:52:08 on Jul 17,2025, Elapsed time: 0:00:03
 Errors: 0, Warnings: 1

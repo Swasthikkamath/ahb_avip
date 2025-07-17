@@ -3,7 +3,7 @@
  
 import AhbGlobalPackage::*;
  
-interface AhbSlaveDriverBFM #(parameter SLAVE_ID =0)(input  bit   hclk,
+interface AhbSlaveDriverBFM (input  bit   hclk,
                              input  bit   hresetn,
 	                  		     input  logic [2:0] hburst,
 			                       input  logic hmastlock,
@@ -87,7 +87,7 @@ interface AhbSlaveDriverBFM #(parameter SLAVE_ID =0)(input  bit   hclk,
     `uvm_info(name,$sformatf("DRIVING THE Single Transfer"),UVM_LOW)
     
     while(SlaveDriverCb.hselx==0)@(SlaveDriverCb);
-     `uvm_info(name,$sformatf("TRANSFER SERVICED BY SUBORDINATE %0d",SLAVE_ID),UVM_LOW);
+     //`uvm_info(name,$sformatf("TRANSFER SERVICED BY SUBORDINATE %0d",SLAVE_ID),UVM_LOW);
     SlaveDriverCb.hreadyout 		       <= 1;
     dataPacket.haddr     <= haddr;
     dataPacket.htrans    <= ahbTransferEnum'(htrans);
