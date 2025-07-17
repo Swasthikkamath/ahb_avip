@@ -109,6 +109,7 @@ task AhbMasterSequence::body();
   super.body();
   req = AhbMasterTransaction::type_id::create("req");
 
+ repeat(2) begin 
   start_item(req);
   `uvm_info("AHB", $sformatf("req is of type: %s", req.get_type_name()), UVM_LOW)
 
@@ -132,6 +133,11 @@ task AhbMasterSequence::body();
                             }) begin
     `uvm_fatal("AHB", "Randomization failed for 32-bit Write")
   end
+ $display("*****************************************master sequence***********************************");
+ req.print();
+$display("********************************************************************************************");
   finish_item(req);
+ $display("\n \n \n I AM DONE \n \n \n ");
+end 
 endtask: body
 `endif

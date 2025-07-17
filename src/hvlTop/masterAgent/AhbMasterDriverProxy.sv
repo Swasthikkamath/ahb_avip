@@ -64,14 +64,15 @@ task AhbMasterDriverProxy::run_phase(uvm_phase phase);
 
     seq_item_port.get_next_item(req);
 
-    `uvm_info(get_type_name(), $sformatf("REQ-MASTERTX \n %s",req.sprint),UVM_HIGH);
+    `uvm_info(get_type_name(), $sformatf("REQ-MASTERTX \n %s",req.sprint),UVM_LOW);
 
-
+  
+    $display("****************************************************************************************************");
+    req.print();
+    $display("***************************************************************************************************"); 
     AhbMasterSequenceItemConverter::fromClass(req, dataPacket);
     AhbMasterConfigConverter::fromClass(ahbMasterAgentConfig, configPacket);
-
     ahbMasterDriverBFM.driveToBFM(dataPacket,configPacket);
-
     AhbMasterSequenceItemConverter::toClass(dataPacket, req);
 
     seq_item_port.item_done();

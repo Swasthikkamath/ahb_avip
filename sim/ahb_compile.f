@@ -18,6 +18,7 @@
 ../../src/hvlTop/tb/virtualSequences/AhbVirtualSequencePackage.sv
 ../../src/hvlTop/tb/test/AhbTestPackage.sv
 ../../src/hdlTop/ahbInterface/AhbInterface.sv
+../../src/hdlTop/interconnect/AhbInterconnect.sv
 ../../src/hdlTop/masterAgentBFM/AhbMasterDriverBFM.sv
 ../../src/hdlTop/masterAgentBFM/AhbMasterMonitorBFM.sv
 ../../src/hdlTop/masterAgentBFM/AhbMasterAgentBFM.sv

@@ -6,7 +6,7 @@ import AhbGlobalPackage::*;
 interface AhbMasterMonitorBFM(input  bit   hclk,
                               input  bit  hresetn,
                               input logic [ADDR_WIDTH-1:0] haddr,
-                              input logic [NO_OF_SLAVES-1:0] hselx,
+                              //input logic [NO_OF_SLAVES-1:0] hselx,
                               input logic [2:0] hburst,
                               input logic hmastlock,
                               input logic [HPROT_WIDTH-1:0] hprot,
@@ -49,8 +49,8 @@ interface AhbMasterMonitorBFM(input  bit   hclk,
     
     @(posedge hclk);
 
-    while(hready !== 1 && hresp == 1 && htrans == IDLE) begin
-      `uvm_info(name, $sformatf("Inside while loop: hresp =%0d, hready=%0d, hselx=%0d", hresp, hready, hselx), UVM_LOW)
+ /*   while(hready !== 1 && hresp == 1 && htrans == IDLE) begin
+      //`uvm_info(name, $sformatf("Inside while loop: hresp =%0d, hready=%0d, hselx=%0d", hresp, hready, hselx), UVM_LOW)
       @(posedge hclk);
       ahbDataPacket.noOfWaitStates++;
     end
@@ -63,7 +63,7 @@ interface AhbMasterMonitorBFM(input  bit   hclk,
     ahbDataPacket.hmastlock = hmastlock;
     ahbDataPacket.hready = hready;
     ahbDataPacket.hresp = ahbRespEnum'(hresp);
-    ahbDataPacket.hselx = hselx;
+    //ahbDataPacket.hselx = hselx;
     ahbDataPacket.hprot = ahbProtectionEnum'(hprot);
     ahbDataPacket.hwstrb = hwstrb;
 
@@ -72,7 +72,7 @@ interface AhbMasterMonitorBFM(input  bit   hclk,
     end
     else begin
       ahbDataPacket.hrdata = hrdata;
-    end
+    end*/
   endtask : sampleData
 
 endinterface : AhbMasterMonitorBFM

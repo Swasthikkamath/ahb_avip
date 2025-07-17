@@ -88,9 +88,10 @@ task AhbSlaveDriverProxy::run_phase(uvm_phase phase);
       begin
         AhbSlaveSequenceItemConverter::fromClass(req, structPacket); 
         AhbSlaveConfigConverter::fromClass(ahbSlaveAgentConfig, structConfig);
-        ahbSlaveDriverBFM.slaveDriveToBFM(structPacket, structConfig);
+       ahbSlaveDriverBFM.slaveDriveToBFM(structPacket, structConfig);
         AhbSlaveSequenceItemConverter::toClass(structPacket, req); 
       end
+     $display("(((((((((((((((SENT ACK)))))))))))))))");
     seq_item_port.item_done();
   end
 endtask : run_phase

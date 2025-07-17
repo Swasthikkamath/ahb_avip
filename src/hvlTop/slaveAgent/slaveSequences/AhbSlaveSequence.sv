@@ -23,7 +23,8 @@ endfunction : new
 
 task AhbSlaveSequence::body();
   req = AhbSlaveTransaction::type_id::create("req");
-  start_item(req);
+  repeat(2) begin
+  start_item(req); 
   if(!req.randomize() with { foreach(hrdataSeq[i])
     hrdata[i] == hrdataSeq[i];		
                            hreadyout        == hreadyoutSeq;
@@ -35,5 +36,6 @@ task AhbSlaveSequence::body();
   end
   req.print();
   finish_item(req);
+end 
 endtask : body
 `endif

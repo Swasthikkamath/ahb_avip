@@ -3,7 +3,7 @@
  
 import AhbGlobalPackage::*;
  
-interface AhbSlaveDriverBFM (input  bit   hclk,
+interface AhbSlaveDriverBFM #(parameter SLAVE_ID =0)(input  bit   hclk,
                              input  bit   hresetn,
 	                  		     input  logic [2:0] hburst,
 			                       input  logic hmastlock,
@@ -29,7 +29,7 @@ interface AhbSlaveDriverBFM (input  bit   hclk,
  
   `include "uvm_macros.svh"
   import uvm_pkg::*;
-
+/*
   `ifdef slaveStatusRegister 
       reg[7:0]slaveStatusRegister[STATUSREGISTERWIDTH-1:0];
   
@@ -41,7 +41,7 @@ interface AhbSlaveDriverBFM (input  bit   hclk,
 
  `ifdef slaveInstructionRegister
        reg[7:0]slaveControlRegister[INSTRUCTIONREGISTERWIDTH-1:0]; 
-
+*/
   
   string name = "AHB_SLAVE_DRIVER_BFM";
  
@@ -49,30 +49,46 @@ interface AhbSlaveDriverBFM (input  bit   hclk,
   initial begin
     `uvm_info(name,$sformatf(name),UVM_LOW);
   end
- 
+  
+
+  clocking SlaveDriverCb @(posedge hclk);
+    default input #1step output #1step;
+    input  haddr,hburst,hmastlock,hprot,hsize,hnonsec,hexcl,hmaster,htrans,hwrite,hwdata,hwstrb,hselx;
+    output hreadyout;
+  endclocking 
+
   task waitForResetn();
 	  @(negedge hresetn);
    	`uvm_info(name,$sformatf("SYSTEM RESET DETECTED"),UVM_LOW)  
+    //hreadyout =1;
     @(posedge hresetn);
     `uvm_info(name,$sformatf("SYSTEM RESET DEACTIVATED"),UVM_LOW)
   endtask: waitForResetn
 
   task slaveDriveToBFM(inout ahbTransferCharStruct dataPacket, input ahbTransferConfigStruct configPacket);
 	  `uvm_info(name,$sformatf("DRIVE TO BFM TASK"), UVM_LOW);
-
+         $display("######################################################################################\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n HEY I AM \N\N\N"); 
 	  wait(hselx)
-    `uvm_info(name,$sformatf("AFTERHSELASSERTED HTRANSFER = %0d",htrans), UVM_LOW);
+              $display("I AM IN MANIPAL");
+   /* `uvm_info(name,$sformatf("AFTERHSELASSERTED HTRANSFER = %0d",htrans), UVM_LOW);
     if(hburst === SINGLE) begin
       slaveDriveSingleTransfer(dataPacket,configPacket);
 	  end
     else if(hburst !== SINGLE) begin
       slavedriveBurstTransfer(dataPacket,configPacket);
 	  end
+
+  */
+  
+   slaveDriveSingleTransfer(dataPacket,configPacket);
   endtask: slaveDriveToBFM
  
   task slaveDriveSingleTransfer(inout ahbTransferCharStruct dataPacket,input ahbTransferConfigStruct configPacket);
     `uvm_info(name,$sformatf("DRIVING THE Single Transfer"),UVM_LOW)
-    hreadyout 		       <= 1;
+    
+    while(SlaveDriverCb.hselx==0)@(SlaveDriverCb);
+     `uvm_info(name,$sformatf("TRANSFER SERVICED BY SUBORDINATE %0d",SLAVE_ID),UVM_LOW);
+    SlaveDriverCb.hreadyout 		       <= 1;
     dataPacket.haddr     <= haddr;
     dataPacket.htrans    <= ahbTransferEnum'(htrans);
     dataPacket.hsize     <= ahbHsizeEnum'(hsize); 
@@ -80,21 +96,21 @@ interface AhbSlaveDriverBFM (input  bit   hclk,
     dataPacket.hwrite    <= ahbOperationEnum'(hwrite);  
     dataPacket.hmastlock <= hmastlock; 
     dataPacket.hselx     <= hselx;    
-
-    waitCycles(configPacket);
-    if(hwrite) begin
-      dataPacket.hwdata[0] <= hwdata;
+   /*
+    //waitCycles(configPacket);
+    //if(hwrite) begin
+      //dataPacket.hwdata[0] <= hwdata;
       dataPacket.hwstrb[0] <= hwstrb;
 	    hresp <= 0;
     end
 
     else if(!hwrite) begin
-      hrdata <= dataPacket.hrdata[0];
+      hrdata <= dataPacket.hrdata[0];	    hresp  <= 0;
 	    hresp  <= 0;
     end
     @(posedge hclk);
     hreadyout <= 0;
-
+    */
   endtask: slaveDriveSingleTransfer
  
   task slavedriveBurstTransfer(inout ahbTransferCharStruct dataPacket,input ahbTransferConfigStruct configPacket);

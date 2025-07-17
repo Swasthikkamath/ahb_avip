@@ -29,27 +29,25 @@ module HdlTop;
 */
   initial begin
    hclk = 1'b0;
-    forever #10 hclk =!hclk;
+    forever #5 hclk =~hclk;
   end
 
   initial begin
     hresetn = 1'b1;
-   #15 hresetn= 1'b0;
+   @(posedge hclk) hresetn= 1'b0;
 
    // repeat(1) begin
       @(posedge hclk);
+      $display("@%T H EY MAN",$time);
    // end
      hresetn = 1'b1;
   end
 
 
   AhbInterface ahbInterface[NO_OF_MASTERS-1:0](hclk,hresetn);
+  AhbInterconnect ahbinterconnect(ahbInterface.ahbinterconnectModport);
 
-  //AhbMasterAgentBFM ahbMasterAgentBFM[NO_OF_MASTERS-1:0](ahbInterface); 
-
- //AhbSlaveAgentBFM ahbSlaveAgentBFM[NO_OF_SLAVES-1:0](ahbInterface); 
-
-
+   
   
   genvar i;
 

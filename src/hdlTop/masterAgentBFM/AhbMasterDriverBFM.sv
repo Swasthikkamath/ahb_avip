@@ -20,8 +20,8 @@ interface AhbMasterDriverBFM (input  bit   hclk,
                               input  logic hready,
                               input  logic hreadyout,
                               input  logic hresp,
-                              input  logic hexokay,
-                              output logic [NO_OF_SLAVES-1:0] hselx
+                              input  logic hexokay
+                              //output logic [NO_OF_SLAVES-1:0] hselx
                              );
 
   import AhbMasterPackage::*;
@@ -36,12 +36,18 @@ interface AhbMasterDriverBFM (input  bit   hclk,
     $display("THE MASTER AGENT ARE  CREATED AS EXPECTED %m");
   end
 
+  clocking MasterDriverCb @(posedge hclk);
+    default input #1step output #1step;
+    output haddr,hburst,hmastlock,hprot,hsize,hnonsec,hexcl,hmaster,htrans,hwrite,hwdata,hwstrb;
+    input hreadyout;
+  endclocking
+
   task waitForResetn();
     @(negedge hresetn);
     `uvm_info(name ,$sformatf("SYSTEM RESET DETECTED"),UVM_HIGH)
     htrans <= IDLE;  
     @(posedge hresetn);
-    `uvm_info(name ,$sformatf("SYSTEM RESET DEACTIVATED"),UVM_HIGH)
+    `uvm_info(name ,$sformatf(" @%0t SYSTEM RESET DEACTIVATED",$time),UVM_HIGH)
   endtask: waitForResetn
 
   task driveToBFM(inout ahbTransferCharStruct dataPacket, input ahbTransferConfigStruct configPacket);
@@ -58,24 +64,21 @@ interface AhbMasterDriverBFM (input  bit   hclk,
     `uvm_info("INSIDESINGLETRANSFER","BFM",UVM_LOW);
 
     `uvm_info(name,$sformatf("DRIVING THE Single Transfer"),UVM_LOW)
-    haddr     <= dataPacket.haddr;
-    hburst    <= dataPacket.hburst;
-    hmastlock <= dataPacket.hmastlock;
-    hprot     <= dataPacket.hprot;
-    hsize     <= dataPacket.hsize;
-    hnonsec   <= dataPacket.hnonsec;
-    hexcl     <= dataPacket.hexcl;
-    hmaster   <= dataPacket.hmaster;
-    htrans    <= dataPacket.htrans; 
-    hwstrb    <= dataPacket.hwstrb[0];
-    hwrite    <= dataPacket.hwrite;
-    hselx     <= 1'b1;
-
-    WaitStates(configPacket); 
-
-    @(posedge hclk);
-    hwdata <= dataPacket.hwrite ? maskingStrobe(dataPacket.hwdata[0], dataPacket.hwstrb[0]) : '0;
-
+    while(MasterDriverCb.hreadyout==0)@(MasterDriverCb); 
+    MasterDriverCb.haddr     <= dataPacket.haddr;
+    MasterDriverCb.hburst    <= dataPacket.hburst;
+    MasterDriverCb.hmastlock <= dataPacket.hmastlock;
+    MasterDriverCb.hprot     <= dataPacket.hprot;
+    MasterDriverCb.hsize     <= dataPacket.hsize;
+    MasterDriverCb.hnonsec   <= dataPacket.hnonsec;
+    MasterDriverCb.hexcl     <= dataPacket.hexcl;
+    MasterDriverCb.hmaster   <= dataPacket.hmaster;
+    MasterDriverCb.htrans    <= dataPacket.htrans; 
+    MasterDriverCb.hwstrb    <= dataPacket.hwstrb[0];
+    MasterDriverCb.hwrite    <= dataPacket.hwrite;
+    //MasterDriverCb.hselx     <= 1'b1;
+    MasterDriverCb.hwdata <= dataPacket.hwrite ? maskingStrobe(dataPacket.hwdata[0], dataPacket.hwstrb[0]) : '0;
+/*
     if(hresp == 1) begin  
       `uvm_info(name, $sformatf("error Response Detected on Single Transfer at Address: %0h", haddr),UVM_LOW);
     end else if (!dataPacket.hwrite) begin  
@@ -83,7 +86,7 @@ interface AhbMasterDriverBFM (input  bit   hclk,
     end else begin 
       `uvm_info(name, $sformatf("Write Data: %0h to Address: %0h", hwdata, haddr), UVM_LOW);
       `uvm_info(name, $sformatf("Write Data: %0h to Address: %0h", hwdata[0], haddr), UVM_LOW);
-    end
+    end*/
     driveIdle();
   endtask
 
@@ -109,7 +112,7 @@ interface AhbMasterDriverBFM (input  bit   hclk,
       htrans    <= dataPacket.htrans; 
       hwstrb    <= dataPacket.hwstrb[i];
       hwrite    <= dataPacket.hwrite;
-      hselx     <= 1;
+      //hselx     <= 1;
       
       if (hresp == 1) begin
         `uvm_info(name, $sformatf("ERROR detected during Burst Transfer at Address: %0h", haddr),UVM_LOW);
@@ -158,7 +161,7 @@ interface AhbMasterDriverBFM (input  bit   hclk,
   task driveIdle();
     @(posedge hclk);
     htrans <= IDLE;
-    hselx <= 0; 
+    //hselx <= 0; 
     haddr  <= 0;
     hwrite <= 0;
     hwdata <= 0;

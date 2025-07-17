@@ -70,7 +70,7 @@ task AhbMasterMonitorProxy::run_phase(uvm_phase phase);
 
 
     $cast(ahbMasterClonePacket, ahbMasterPacket.clone());
-    `uvm_info(get_type_name(),$sformatf("Sending packet via analysis_port: , \n %s", ahbMasterClonePacket.sprint()),UVM_HIGH)
+//    `uvm_info(get_type_name(),$sformatf("Sending packet via analysis_port: , \n %s", ahbMasterClonePacket.sprint()),UVM_HIGH)
     ahbMasterAnalysisPort.write(ahbMasterClonePacket);
   end
 
