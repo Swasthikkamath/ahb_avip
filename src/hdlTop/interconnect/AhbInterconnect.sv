@@ -111,8 +111,6 @@ generate
 
            if(|master_request[slaveLoop]) begin // Only arbitrate if someone is requesting
             
-            // FIXED: Start from the master AFTER the last served master
-            // Search in round-robin order starting from (rr_pointer + 1)
             for(int search_offset = 1; search_offset <= NO_OF_MASTERS; search_offset++) begin
               master_to_check = (rr_pointer[slaveLoop] + search_offset) % NO_OF_MASTERS;
               
@@ -124,8 +122,6 @@ generate
               end
             end
             
-            // Update pointer to point to the master we just granted
-            // (This master becomes the "last served" for next round)
             if(grant_found) begin
               next_rr_pointer = granted_master_id;
             end
@@ -140,13 +136,7 @@ generate
       
       for(genvar gs = 0; gs < NO_OF_SLAVES; gs++) begin : slave_select_check
         always_comb begin
-          // Slave is selected if:
-          // 1. This master is granted access to this slave, OR
-          // 2. This master is current owner and addressing this slave
-          selected_slaves[gs] = master_grant[gs][gm] || 
-                               (slave_has_owner[gs] && 
-                                (current_owner[gs] == gm) && 
-                                master_request[gs][gm]);
+          selected_slaves[gs] = master_grant[gs][gm];
         end
       end
       

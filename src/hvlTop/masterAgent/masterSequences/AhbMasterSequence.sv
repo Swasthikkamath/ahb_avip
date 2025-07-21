@@ -113,7 +113,7 @@ task AhbMasterSequence::body();
   start_item(req);
   `uvm_info("AHB", $sformatf("req is of type: %s", req.get_type_name()), UVM_LOW)
 
-  if (!req.randomize() with { 
+  if (!req.randomize() with { haddr == (2**32)/2 +1; 
     			      hselx      == hselxSeq;
                               hburst     == hburstSeq;
 			      hmastlock  == hmastlockSeq;
