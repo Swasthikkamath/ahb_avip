@@ -45,7 +45,7 @@ module HdlTop;
 
 
   AhbInterface ahbInterface[NO_OF_MASTERS-1:0](hclk,hresetn);
-  AhbInterconnect ahbinterconnect(ahbInterface.ahbinterconnectModport);
+  AhbInterconnect ahbinterconnect(hclk,hresetn,ahbInterface.ahbinterconnectModport);
 
    
   

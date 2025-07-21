@@ -22,7 +22,7 @@ interface AhbSlaveDriverBFM (input  bit   hclk,
 			                       output logic hresp,
                              output logic hexokay,
                              input  logic hready,                                                           
-                             input  logic [NO_OF_SLAVES-1:0]hselx
+                             input  logic hselx
                             );
  
   import AhbSlavePackage::*;
