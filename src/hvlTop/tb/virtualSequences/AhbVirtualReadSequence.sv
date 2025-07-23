@@ -21,9 +21,10 @@ task AhbVirtualReadSequence::body();
   super.body();
   foreach(ahbMasterSequence[i])
     ahbMasterSequence[i] = AhbMasterSequence::type_id::create("ahbMasterSequence");
-  foreach(ahbSlaveSequence[i])
+  foreach(ahbSlaveSequence[i]) begin
     ahbSlaveSequence[i]= AhbSlaveSequence::type_id::create("ahbSlaveSequence");
-  
+    ahbSlaveSequence[i].randomize();
+   end
   foreach(ahbMasterSequence[i])begin 
     if(!ahbMasterSequence[i].randomize() with {
                                                               hsizeSeq dist {BYTE:=1, HALFWORD:=1, WORD:=1};
@@ -36,17 +37,24 @@ task AhbVirtualReadSequence::body();
        `uvm_error(get_type_name(), "Randomization failed : Inside AhbVirtualReadSequence")
     end
    end 
-   foreach(ahbSlaveSequence[i])
-    ahbSlaveSequence[i].randomize();
+ fork
+       $display("\n\n\n--------------------------------ENTERED FORK---------------------------------------\n\n\n ");
+       foreach(ahbMasterSequence[i]) begin 
+         fork
+            automatic int j = i;
+            ahbMasterSequence[j].start(p_sequencer.ahbMasterSequencer[j]);
+         join_none 
+       end 
+       foreach(ahbSlaveSequence[i]) begin
+         fork
+          automatic int j =i;
+          ahbSlaveSequence[j].start(p_sequencer.ahbSlaveSequencer[j]);
+         join_none
+        end 
+     join
+    wait fork;
+   $display("\n\n\n -------------------------------FORK ENDED---------------------------------- \n\n\n");	
 
-    fork
-      foreach(ahbSlaveSequence[i])
-       ahbSlaveSequence[i].start(p_sequencer.ahbSlaveSequencer[i]);
-      
-      foreach(ahbMasterSequence[i])
-       ahbMasterSequence[i].start(p_sequencer.ahbMasterSequencer[i]); 
-    join	
-  
-endtask : body
+    endtask : body
  
 `endif  
