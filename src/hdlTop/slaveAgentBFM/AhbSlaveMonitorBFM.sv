@@ -78,4 +78,3 @@ interface AhbSlaveMonitorBFM (input  bit   hclk,
 endinterface : AhbSlaveMonitorBFM
 
 `endif
-
