@@ -64,7 +64,7 @@ reg[7:0]normalReg[0:1023];
   task waitForResetn();
 	  @(negedge hresetn);
    	`uvm_info(name,$sformatf("SYSTEM RESET DETECTED"),UVM_LOW)  
-    hreadyout =1;
+    //hreadyout =1;
     @(posedge hresetn);
     `uvm_info(name,$sformatf("SYSTEM RESET DEACTIVATED"),UVM_LOW)
   endtask: waitForResetn
@@ -77,13 +77,15 @@ reg[7:0]normalReg[0:1023];
   end  
  endtask: slaveDriveToBFM
  
+ assign hreadyout =(!hresetn )? 1 : hselx ? 1:0;
+
   task slaveDriveSingleTransfer(inout ahbTransferCharStruct dataPacket,input ahbTransferConfigStruct configPacket);
     //`uvm_info(name,$sformatf("DRIVING THE Single Transfer"),UVM_LOW)
     bit[31:0]temp;
     @(SlaveDriverCb);
     while(SlaveDriverCb.hselx==0 || $isunknown(SlaveDriverCb.hselx))@(SlaveDriverCb);
     $display("I AM IN MANIPAL");
-    SlaveDriverCb.hreadyout <= 1;
+    //SlaveDriverCb.hreadyout <= 1;
     dataPacket.haddr     <= haddr;
     dataPacket.htrans    <= ahbTransferEnum'(htrans);
     dataPacket.hsize     <= ahbHsizeEnum'(hsize); 
@@ -125,7 +127,7 @@ reg[7:0]normalReg[0:1023];
     endcase
  
 	  for(int i = 0;i < burst_length;i++) begin
-      hreadyout <= 1;
+      //hreadyout <= 1;
       dataPacket.haddr       <= haddr;
       dataPacket.hburst      <= ahbBurstEnum'(hburst);  
       dataPacket.hsize       <= ahbHsizeEnum'(hsize);  
@@ -155,7 +157,7 @@ reg[7:0]normalReg[0:1023];
         hresp  <= 0;
       end
     end
-    hreadyout <= 0;
+    //hreadyout <= 0;
   endtask: slavedriveBurstTransfer
  
  
@@ -164,11 +166,11 @@ reg[7:0]normalReg[0:1023];
     hresp <= 0;
     repeat(configPacket.noOfWaitStates) begin
 	    `uvm_info(name,$sformatf(" DRIVING WAIT STATE"),UVM_LOW);
-    	hreadyout <= 0;
-      hresp <=  ~hreadyout;
+    //	hreadyout <= 0;
+      //hresp <=  ~hreadyout;
       @(posedge hclk);
     end
-    hreadyout<=1;
+   // hreadyout<=1;
  
     `uvm_info(name, "Bus is now out of wait cycles", UVM_LOW);
   endtask: waitCycles
