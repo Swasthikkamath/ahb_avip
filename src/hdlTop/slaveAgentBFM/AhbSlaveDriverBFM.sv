@@ -64,7 +64,7 @@ reg[7:0]normalReg[0:1023];
   task waitForResetn();
 	  @(negedge hresetn);
    	`uvm_info(name,$sformatf("SYSTEM RESET DETECTED"),UVM_LOW)  
-    //hreadyout =1;
+    hreadyout =1;
     @(posedge hresetn);
     `uvm_info(name,$sformatf("SYSTEM RESET DEACTIVATED"),UVM_LOW)
   endtask: waitForResetn
@@ -77,12 +77,19 @@ reg[7:0]normalReg[0:1023];
   end  
  endtask: slaveDriveToBFM
  
- assign hreadyout =(!hresetn )? 1 : hselx ? 1:0;
+ //assign hreadyout =(!hresetn )? 1 : hselx ? 1:0;
 
   task slaveDriveSingleTransfer(inout ahbTransferCharStruct dataPacket,input ahbTransferConfigStruct configPacket);
     //`uvm_info(name,$sformatf("DRIVING THE Single Transfer"),UVM_LOW)
     bit[31:0]temp;
     @(SlaveDriverCb);
+    
+    wait(hselx)begin 
+     repeat(0) begin 
+       @(SlaveDriverCb);
+     end
+     hreadyout = 1;
+    end 
     while(SlaveDriverCb.hselx==0 || $isunknown(SlaveDriverCb.hselx))@(SlaveDriverCb);
     $display("I AM IN MANIPAL");
     //SlaveDriverCb.hreadyout <= 1;
