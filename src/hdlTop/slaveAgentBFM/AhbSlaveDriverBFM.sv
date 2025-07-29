@@ -82,17 +82,21 @@ reg[7:0]normalReg[0:1023];
   task slaveDriveSingleTransfer(inout ahbTransferCharStruct dataPacket,input ahbTransferConfigStruct configPacket);
     //`uvm_info(name,$sformatf("DRIVING THE Single Transfer"),UVM_LOW)
     bit[31:0]temp;
-    @(SlaveDriverCb);
     
+
+    @(SlaveDriverCb);
+   
     wait(hselx)begin 
-     repeat(0) begin 
-       @(SlaveDriverCb);
-     end
      hreadyout = 1;
-    end 
+    end
+
+ 
     while(SlaveDriverCb.hselx==0 || $isunknown(SlaveDriverCb.hselx))@(SlaveDriverCb);
     $display("I AM IN MANIPAL");
+    //SlaveDriverCb.hreadyout <= 0;
+    //@(SlaveDriverCb);
     //SlaveDriverCb.hreadyout <= 1;
+
     dataPacket.haddr     <= haddr;
     dataPacket.htrans    <= ahbTransferEnum'(htrans);
     dataPacket.hsize     <= ahbHsizeEnum'(hsize); 
@@ -116,7 +120,7 @@ reg[7:0]normalReg[0:1023];
        end 
       hrdata = temp;
       $display("#######################################################\n \n \n THE DATA READ IS %0h \n \n ########################################################",hrdata);
-   @(SlaveDriverCb);
+  // @(SlaveDriverCb);
  
    end
    
