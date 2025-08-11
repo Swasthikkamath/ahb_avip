@@ -149,13 +149,32 @@ endgenerate
 
       always_comb begin
         logic can_accept;
+        logic locked_present;
         master_grant[s] = '0;
 
+        for(int i=0;i<NO_OF_MASTERS;i++) 
+         if(master_request[s][i]) 
+           if(master_htrans[i]==1) begin 
+              locked_present=1;
+              break;
+           end 
+
         can_accept = !slave_data_phase[s].valid || slave_hreadyout[s];
-         
-        if(can_accept == 1 && master_htrans[current_owner[s]] == 2'b 11 && slave_has_owner[s]==1) 
+
+
+
+
+        if(locked_present==1 && can_accept==1) 
+          for (int i = 0; i < NO_OF_MASTERS; i++) begin
+            int master_idx;
+            master_idx = (rr_pointer[s] + i) % NO_OF_MASTERS;
+            if (master_request[s][master_idx] && master_hmastlock[master_idx]==1) begin
+              master_grant[s][master_idx] = 1'b1;
+              break;
+            end
+          end
+        else if(can_accept == 1 && master_htrans[current_owner[s]] == 2'b 11 && slave_has_owner[s]==1) 
           master_grant[s][current_owner[s]] =1;
- 
         else if (can_accept) begin
           for (int i = 0; i < NO_OF_MASTERS; i++) begin
             int master_idx;
