@@ -47,20 +47,26 @@ interface AhbMasterDriverBFM (input  bit   hclk,
     `uvm_info(name ,$sformatf("SYSTEM RESET DETECTED"),UVM_HIGH)
     htrans <= IDLE;  
     @(posedge hresetn);
+   @(MasterDriverCb);
     `uvm_info(name ,$sformatf(" @%0t SYSTEM RESET DEACTIVATED",$time),UVM_HIGH)
   endtask: waitForResetn
 
   task driveToBFM(inout ahbTransferCharStruct dataPacket, input ahbTransferConfigStruct configPacket);
+  
+    if(dataPacket.hburst == SINGLE) begin
       driveSingleTransfer(dataPacket,configPacket);
-  endtask: driveToBFM
+    end
+    else if(dataPacket.hburst != SINGLE) begin
+      driveBurstTransfer(dataPacket,configPacket);
+    end
+endtask: driveToBFM
 
   task driveSingleTransfer(inout ahbTransferCharStruct dataPacket,input ahbTransferConfigStruct configPacket);
     `uvm_info("INSIDESINGLETRANSFER","BFM",UVM_LOW);
 
     `uvm_info(name,$sformatf("DRIVING THE Single Transfer"),UVM_LOW)
-     @(MasterDriverCb);
-    while(MasterDriverCb.hready==0 || $isunknown(MasterDriverCb.hready))@(MasterDriverCb); 
-      $display("ENTERED THE DRIVER @%t when data is %0h",$time,dataPacket.hwdata);
+    //@(MasterDriverCb);
+  //ADDRESS PHASE  
     MasterDriverCb.haddr     <= dataPacket.haddr;
     MasterDriverCb.hburst    <= dataPacket.hburst;
     MasterDriverCb.hmastlock <= dataPacket.hmastlock;
@@ -69,18 +75,22 @@ interface AhbMasterDriverBFM (input  bit   hclk,
     MasterDriverCb.hnonsec   <= dataPacket.hnonsec;
     MasterDriverCb.hexcl     <= dataPacket.hexcl;
     MasterDriverCb.hmaster   <= dataPacket.hmaster;
-    MasterDriverCb.htrans    <= dataPacket.htrans; 
+    MasterDriverCb.htrans    <= dataPacket.htrans;
     MasterDriverCb.hwstrb    <= dataPacket.hwstrb[0];
     MasterDriverCb.hwrite    <= dataPacket.hwrite;
-    //MasterDriverCb.hselx     <= 1'b1;
+
+
+    @(MasterDriverCb);
+    while(MasterDriverCb.hready==0 || $isunknown(MasterDriverCb.hready))@(MasterDriverCb); 
+      $display("ENTERED THE DRIVER @%t when data is %0h",$time,dataPacket.hwdata);
+  //DATA PHASE 
     MasterDriverCb.hwdata <= dataPacket.hwrite ? maskingStrobe(dataPacket.hwdata[0], dataPacket.hwstrb[0]) : '0;
-//    while(MasterDriverCb.hready==0 || $isunknown(MasterDriverCb.hready))@(MasterDriverCb);
-    //@(MasterDriverCb);
-//    driveIdle();
-  endtask
+  
+ endtask
 
   task driveBurstTransfer(inout ahbTransferCharStruct dataPacket,input ahbTransferConfigStruct configPacket);
-    int burst_length;
+    automatic int burst_length;
+    automatic int i;
     automatic logic [ADDR_WIDTH-1:0] current_address = dataPacket.haddr;
     case (dataPacket.hburst)
       3'b010, 3'b011 : burst_length = 4;  // INCR4, WRAP4
@@ -89,30 +99,60 @@ interface AhbMasterDriverBFM (input  bit   hclk,
       default: burst_length = 1;
     endcase
 
-    for(int i = 0;i < burst_length; i++) begin
-      haddr     <= current_address;
-      hburst    <= dataPacket.hburst;
-      hmastlock <= dataPacket.hmastlock;
-      hprot     <= dataPacket.hprot;
-      hsize     <= dataPacket.hsize;
-      hnonsec   <= dataPacket.hnonsec;
-      hexcl     <= dataPacket.hexcl;
-      hmaster   <= dataPacket.hmaster;
-      htrans    <= dataPacket.htrans; 
-      hwstrb    <= dataPacket.hwstrb[i];
-      hwrite    <= dataPacket.hwrite;
-      //hselx     <= 1;
-      
-      if (hresp == 1) begin
-        `uvm_info(name, $sformatf("ERROR detected during Burst Transfer at Address: %0h", haddr),UVM_LOW);
+    MasterDriverCb.haddr     <= current_address;
+     MasterDriverCb.hburst    <= dataPacket.hburst;
+     MasterDriverCb.hmastlock <= dataPacket.hmastlock;
+     MasterDriverCb.hprot     <= dataPacket.hprot;
+     MasterDriverCb.hsize     <= dataPacket.hsize;
+     MasterDriverCb.hnonsec   <= dataPacket.hnonsec;
+    MasterDriverCb.hexcl     <= dataPacket.hexcl;
+    MasterDriverCb.hmaster   <= dataPacket.hmaster;
+    MasterDriverCb.htrans    <= dataPacket.htrans;
+    MasterDriverCb.hwstrb    <= dataPacket.hwstrb[0];
+    MasterDriverCb.hwrite    <= dataPacket.hwrite;
+  
+   @(MasterDriverCb);
+  while(MasterDriverCb.hready==0 || $isunknown(MasterDriverCb.hready))@(MasterDriverCb);
+
+    hwdata <= dataPacket.hwrite ? maskingStrobe(dataPacket.hwdata[0], dataPacket.hwstrb[0]) : '0;
+
+    for(i = 1;i < burst_length; i++) begin
+    
+  if (dataPacket.hburst == 3'b010 || dataPacket.hburst == 3'b100 || dataPacket.hburst == 3'b110) begin
+        current_address = (current_address & ~(burst_length * (1 << dataPacket.hsize) - 1)) | ((current_address + (1 << dataPacket.hsize)) & (burst_length * (1 << dataPacket.hsize) - 1));
+      end
+      else begin
+        current_address += (1 << dataPacket.hsize);
       end
 
-      if (dataPacket.hburst == 3'b010 || dataPacket.hburst == 3'b100 || dataPacket.hburst == 3'b110) begin
+
+       $display("HEY I AM INSIDE BURST");
+      MasterDriverCb.haddr     <= current_address;
+     MasterDriverCb.hburst    <= dataPacket.hburst;
+     MasterDriverCb.hmastlock <= dataPacket.hmastlock;
+     MasterDriverCb.hprot     <= dataPacket.hprot;
+     MasterDriverCb.hsize     <= dataPacket.hsize;
+     MasterDriverCb.hnonsec   <= dataPacket.hnonsec;
+    MasterDriverCb.hexcl     <= dataPacket.hexcl;
+    MasterDriverCb.hmaster   <= dataPacket.hmaster;
+    MasterDriverCb.htrans    <= 2'b 11;
+    MasterDriverCb.hwstrb    <= dataPacket.hwstrb[0];
+    MasterDriverCb.hwrite    <= dataPacket.hwrite;
+    
+   @(MasterDriverCb); 
+  while(MasterDriverCb.hready==0 || $isunknown(MasterDriverCb.hready))@(MasterDriverCb);
+
+/*      if (hresp == 1) begin
+        `uvm_info(name, $sformatf("ERROR detected during Burst Transfer at Address: %0h", haddr),UVM_LOW);
+      end*/
+
+/*      if (dataPacket.hburst == 3'b010 || dataPacket.hburst == 3'b100 || dataPacket.hburst == 3'b110) begin
         current_address = (current_address & ~(burst_length * (1 << dataPacket.hsize) - 1)) | ((current_address + (1 << dataPacket.hsize)) & (burst_length * (1 << dataPacket.hsize) - 1));
       end 
       else begin
         current_address += (1 << dataPacket.hsize); 
-      end
+      end*/
+   /*
       if(i > 0)begin
         if(dataPacket.busyControl[i]>0) begin
           driveBusyTransfer(dataPacket, current_address) ;
@@ -122,9 +162,8 @@ interface AhbMasterDriverBFM (input  bit   hclk,
         end
       end
       if(i==0) 
-        WaitStates(configPacket);
+        WaitStates(configPacket);*/
 
-      @(posedge hclk);
       hwdata <= dataPacket.hwrite ? maskingStrobe(dataPacket.hwdata[i], dataPacket.hwstrb[i]) : '0;
     end
 
