@@ -86,13 +86,13 @@ reg[7:0]normalReg[0:1023];
 
     bit[31:0]addressTemp;
     bit[31:0]dataTemp; 
-
+    $display("MONITORED DELAYED");
     @(SlaveDriverCb);
-   
+    $display("DELAY DONE ");
  
-    while(SlaveDriverCb.hselx==0 || $isunknown(SlaveDriverCb.hselx)) @(SlaveDriverCb);
-    
-    SlaveDriverCb.hreadyout <= 0;
+    while(SlaveDriverCb.hselx==0 || $isunknown(SlaveDriverCb.hselx))  begin  $display("MONITOR %t",$time);@(SlaveDriverCb);end 
+     $display("MONITORED ADDRESS PHASE");
+   SlaveDriverCb.hreadyout <= 0;
     addressTemp = dataPacket.haddr;
     @(SlaveDriverCb);
     //@(SlaveDriverCb);
@@ -121,9 +121,9 @@ reg[7:0]normalReg[0:1023];
          temp = { normalReg[(haddr[9:0])+i] , temp[31:8]};
        end 
       hrdata = temp;
-      $display("#######################################################\n \n \n THE DATA READ IS %0h \n \n ########################################################",hrdata);
+      $display("#######################################################\n \n \n THE DATA READ IS %0h \n \n %0t ########################################################",hrdata,$time);
    end
-  
+   $display("DATA READ OR WRITTEN"); 
   endtask: slaveDriveSingleTransfer
  
   task slavedriveBurstTransfer(inout ahbTransferCharStruct dataPacket,input ahbTransferConfigStruct configPacket);
