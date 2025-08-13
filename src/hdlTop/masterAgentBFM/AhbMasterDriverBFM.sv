@@ -43,6 +43,7 @@ interface AhbMasterDriverBFM (input  bit   hclk,
   endclocking
 
   task waitForResetn();
+   $display("RESET CALLED");
     @(negedge hresetn);
     `uvm_info(name ,$sformatf("SYSTEM RESET DETECTED"),UVM_HIGH)
     htrans <= IDLE;  
@@ -57,7 +58,7 @@ interface AhbMasterDriverBFM (input  bit   hclk,
       driveSingleTransfer(dataPacket,configPacket);
     end
     else if(dataPacket.hburst != SINGLE) begin
-      driveBurstTransfer(dataPacket,configPacket);
+     driveBurstTransfer(dataPacket,configPacket);
     end
 endtask: driveToBFM
 
@@ -79,17 +80,18 @@ endtask: driveToBFM
     MasterDriverCb.hwstrb    <= dataPacket.hwstrb[0];
     MasterDriverCb.hwrite    <= dataPacket.hwrite;
 
-
+    $display("BEFOREDELAT DRIVER");
     @(MasterDriverCb);
-    while(MasterDriverCb.hready==0 || $isunknown(MasterDriverCb.hready))@(MasterDriverCb); 
+    $display("AFTER DELAY DRIVER");
+    while(MasterDriverCb.hready==0 || $isunknown(MasterDriverCb.hready)) begin $display("DRIVER STUCK");  @(MasterDriverCb);  end
       $display("ENTERED THE DRIVER @%t when data is %0h",$time,dataPacket.hwdata);
   //DATA PHASE 
     MasterDriverCb.hwdata <= dataPacket.hwrite ? maskingStrobe(dataPacket.hwdata[0], dataPacket.hwstrb[0]) : '0;
-  
+    $display("DATA SENT OUT"); 
  endtask
 
   task driveBurstTransfer(inout ahbTransferCharStruct dataPacket,input ahbTransferConfigStruct configPacket);
-    automatic int burst_length;
+   automatic int burst_length;
     automatic int i;
     automatic logic [ADDR_WIDTH-1:0] current_address = dataPacket.haddr;
     case (dataPacket.hburst)
@@ -98,7 +100,7 @@ endtask: driveToBFM
       3'b110, 3'b111 : burst_length = 16; // INCR16, WRAP16
       default: burst_length = 1;
     endcase
-
+  $display("INSIDE BURST");
     MasterDriverCb.haddr     <= current_address;
      MasterDriverCb.hburst    <= dataPacket.hburst;
      MasterDriverCb.hmastlock <= dataPacket.hmastlock;
@@ -112,7 +114,7 @@ endtask: driveToBFM
     MasterDriverCb.hwrite    <= dataPacket.hwrite;
   
    @(MasterDriverCb);
-  while(MasterDriverCb.hready==0 || $isunknown(MasterDriverCb.hready))@(MasterDriverCb);
+  while(MasterDriverCb.hready==0 || $isunknown(MasterDriverCb.hready)) begin  $display("DRIVER");@(MasterDriverCb);end 
 
     hwdata <= dataPacket.hwrite ? maskingStrobe(dataPacket.hwdata[0], dataPacket.hwstrb[0]) : '0;
 
