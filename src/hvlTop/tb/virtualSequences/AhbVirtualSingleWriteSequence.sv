@@ -34,32 +34,32 @@ task AhbVirtualSingleWriteSequence::body();
                                                htransSeq == NONSEQ;
                                                hburstSeq == SINGLE;
 						                       foreach(busyControlSeq[i]) 
-												busyControlSeq[i] dist {0:=100, 1:=0};}
+												 busyControlSeq[i] dist {0:=100, 1:=0};}
 	   ) begin
        `uvm_error(get_type_name(), "Randomization failed : Inside AhbVirtualSingleWriteSequence")
     end
-   end 
-    fork
-       begin 
-       foreach(ahbMasterSequence[i]) begin 
-         fork
-            automatic int j = i;
-            ahbMasterSequence[j].start(p_sequencer.ahbMasterSequencer[j]);
-         join_none 
-       end 
-       wait fork;
-       end 
+  end 
+  fork
+    begin 
+      foreach(ahbMasterSequence[i]) begin 
+        fork
+          automatic int j = i;
+          ahbMasterSequence[j].start(p_sequencer.ahbMasterSequencer[j]);
+        join_none 
+      end 
+      wait fork;
+    end 
 
-       begin 
-       foreach(ahbSlaveSequence[i]) begin
-         fork
+    begin 
+      foreach(ahbSlaveSequence[i]) begin
+        fork
           automatic int j =i;
           ahbSlaveSequence[j].start(p_sequencer.ahbSlaveSequencer[j]);
-         join_none
-        end
-        wait fork; 
-       end 
-     join
+        join_none
+      end
+      wait fork; 
+    end 
+  join
 endtask : body
  
 `endif 
