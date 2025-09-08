@@ -68,10 +68,10 @@ class AhbMasterSequence extends AhbMasterBaseSequence;
 
 
      constraint strobleValue1{foreach(hwstrbSeq[i]) { if(hsizeSeq == BYTE) $countones(hwstrbSeq[i]) == 1;
-											 else if(hsizeSeq == HALFWORD) $countones(hwstrbSeq[i]) == 2;
-											 else if(hsizeSeq == WORD) $countones(hwstrbSeq[i]) == 4;
-											 else if(hsizeSeq == DOUBLEWORD) $countones(hwstrbSeq[i]) == 8;
-											}
+										 else if(hsizeSeq == HALFWORD) $countones(hwstrbSeq[i]) == 2;
+										 else if(hsizeSeq == WORD) $countones(hwstrbSeq[i]) == 4;
+										 else if(hsizeSeq == DOUBLEWORD) $countones(hwstrbSeq[i]) == 8;
+										}
 					  }
 
      constraint burstsize1{if(hburstSeq == WRAP4 || hburstSeq == INCR4) hwdataSeq.size() == 4;
