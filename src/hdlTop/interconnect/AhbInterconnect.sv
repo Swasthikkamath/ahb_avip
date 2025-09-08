@@ -360,10 +360,10 @@ endgenerate
         ahbMasterInterface[m].hresp  = 2'b00;
 
  //       oldest_is_valid = (master_count[m] > 0) && master_pipeline[m][master_rd_ptr[m]].valid;
-      oldest_is_ready = 1'b0; // Default to ready if no active transaction
+      oldest_is_ready = 1'b1; // Default to ready if no active transaction
 
         for(int s=0;s <NO_OF_SLAVES;s++)
-         if(m == owner[s] || master_grant[s][m]==1)
+         if(m == owner[s])
            begin 
             oldest_is_ready = slave_hreadyout[s];        
            end 
