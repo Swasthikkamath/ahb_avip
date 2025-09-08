@@ -142,5 +142,3 @@ interface AhbMasterAssertion (
 endinterface : AhbMasterAssertion
 
 `endif
-
-
